@@ -1,6 +1,6 @@
 # Dragon Slave
 
-> Fire makes a fine servant, but a harsh mistress.
+*Fire makes a fine servant, but a harsh mistress.*
 
 ```
 ::::-/++
