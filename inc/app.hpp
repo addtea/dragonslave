@@ -52,12 +52,12 @@ public:
     inline Graphics& get_graphics() { return graphics_; }
 
 private:
-    static void handle_char(GLFWwindow* window, unsigned int code_point);
-    static void handle_key(GLFWwindow* window, int key, int scancode, int action, int mods);
-    static void handle_cursor_pos(GLFWwindow* window, double x, double y);
-    static void handle_mouse_button(GLFWwindow* window, int button, int action, int mods);
-    static void handle_scroll(GLFWwindow* window, double dx, double dy);
-    static void handle_framebuffer_size(GLFWwindow* window, int width, int height);
+    static void handle_char_(GLFWwindow* window, unsigned int code_point);
+    static void handle_key_(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void handle_cursor_pos_(GLFWwindow* window, double x, double y);
+    static void handle_mouse_button_(GLFWwindow* window, int button, int action, int mods);
+    static void handle_scroll_(GLFWwindow* window, double dx, double dy);
+    static void handle_framebuffer_size_(GLFWwindow* window, int width, int height);
 
     GLFWwindow* glfw_window_ = nullptr;
 

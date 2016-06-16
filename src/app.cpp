@@ -47,12 +47,12 @@ void App::init(const AppConfig& config)
 
     glfwSetWindowUserPointer(glfw_window_, this);
 
-    glfwSetCharCallback(glfw_window_, App::handle_char);
-    glfwSetKeyCallback(glfw_window_, App::handle_key);
-    glfwSetCursorPosCallback(glfw_window_, App::handle_cursor_pos);
-    glfwSetMouseButtonCallback(glfw_window_, App::handle_mouse_button);
-    glfwSetScrollCallback(glfw_window_, App::handle_scroll);
-    glfwSetFramebufferSizeCallback(glfw_window_, App::handle_framebuffer_size);
+    glfwSetCharCallback(glfw_window_, App::handle_char_);
+    glfwSetKeyCallback(glfw_window_, App::handle_key_);
+    glfwSetCursorPosCallback(glfw_window_, App::handle_cursor_pos_);
+    glfwSetMouseButtonCallback(glfw_window_, App::handle_mouse_button_);
+    glfwSetScrollCallback(glfw_window_, App::handle_scroll_);
+    glfwSetFramebufferSizeCallback(glfw_window_, App::handle_framebuffer_size_);
 
     glfwGetFramebufferSize(glfw_window_, &width, &height);
     window_.on_resize(width, height);
@@ -63,37 +63,37 @@ void App::term()
     glfwTerminate();
 }
 
-void App::handle_char(GLFWwindow* window, unsigned int codepoint) 
+void App::handle_char_(GLFWwindow* window, unsigned int codepoint)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_char(codepoint);
 }
 
-void App::handle_key(GLFWwindow* window, int key, int scancode, int action, int mods) 
+void App::handle_key_(GLFWwindow* window, int key, int scancode, int action, int mods)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_key(key, scancode, action, mods);
 }
 
-void App::handle_cursor_pos(GLFWwindow* window, double x, double y) 
+void App::handle_cursor_pos_(GLFWwindow* window, double x, double y) 
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_cursor_pos(x, y);
 }
 
-void App::handle_mouse_button(GLFWwindow* window, int button, int action, int mods) 
+void App::handle_mouse_button_(GLFWwindow* window, int button, int action, int mods)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_mouse_button(button, action, mods);
 }
 
-void App::handle_scroll(GLFWwindow* window, double dx, double dy) 
+void App::handle_scroll_(GLFWwindow* window, double dx, double dy)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_scroll(dx, dy);
 }
 
-void App::handle_framebuffer_size(GLFWwindow* window, int width, int height) 
+void App::handle_framebuffer_size_(GLFWwindow* window, int width, int height)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->window_.on_resize(width, height);
