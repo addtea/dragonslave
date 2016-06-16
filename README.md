@@ -1,2 +1,2 @@
 # dragonslave
-Lina lover's only
+Lina lovers only
