@@ -45,7 +45,7 @@ public:
     void init(const AppConfig& config);
     void term();
 
-    void poll_events();
+    void poll();
 
     inline Window& get_window() { return window_; }
     inline Input& get_input() { return input_; }

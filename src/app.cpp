@@ -5,7 +5,9 @@ namespace dragonslave {
 
 App::App() { } 
 
+
 App::~App() { }
+
 
 void App::init(const AppConfig& config)
 {
@@ -51,8 +53,11 @@ void App::init(const AppConfig& config)
     glfwGetFramebufferSize(glfw_window_, &width, &height);
     window_.on_resize(width, height);
 
+    window_.init(glfw_window_);
+    input_.init(glfw_window_);
     graphics_.init();
 }
+
 
 void App::term()
 {
@@ -60,11 +65,19 @@ void App::term()
     glfwTerminate();
 }
 
+
+void App::poll()
+{
+    glfwPollEvents();
+}
+
+
 void App::handle_char_(GLFWwindow* window, unsigned int codepoint)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_char(codepoint);
 }
+
 
 void App::handle_key_(GLFWwindow* window, int key, int scancode, int action, int mods)
 { 
@@ -72,11 +85,13 @@ void App::handle_key_(GLFWwindow* window, int key, int scancode, int action, int
     app->input_.on_key(key, scancode, action, mods);
 }
 
+
 void App::handle_cursor_pos_(GLFWwindow* window, double x, double y) 
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_cursor_pos(x, y);
 }
+
 
 void App::handle_mouse_button_(GLFWwindow* window, int button, int action, int mods)
 { 
@@ -84,11 +99,13 @@ void App::handle_mouse_button_(GLFWwindow* window, int button, int action, int m
     app->input_.on_mouse_button(button, action, mods);
 }
 
+
 void App::handle_scroll_(GLFWwindow* window, double dx, double dy)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
     app->input_.on_scroll(dx, dy);
 }
+
 
 void App::handle_framebuffer_size_(GLFWwindow* window, int width, int height)
 { 
