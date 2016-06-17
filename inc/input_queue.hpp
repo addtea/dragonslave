@@ -3,7 +3,6 @@
 
 namespace dragonslave {
 
-
 enum class InputType {
     KEYBOARD,
     MOUSE_POS,
@@ -11,30 +10,61 @@ enum class InputType {
     MOUSE_SCROLL,
 };
 
-
-struct InputEvent 
+struct MouseEvent
 {
-    InputType type;
-    int action = 0;
-    char key = 0;
     double x = 0, y = 0;
+    int button = 0;
 
-    InputEvent(InputType type,
-               int action, char key, double x, double y)
-      : type(type), action(action), key(key), x(x), y(y) 
+    MouseEvent(double x, double y) :
+        x(x), y(y)
+    { }
+
+    MouseEvent(int button) :
+        button(button)
     { }
 };
 
+struct KeyboardEvent
+{
+    int key, scancode;
+
+    KeyboardEvent(int key, int scancode)
+        : key(key), scancode(scancode)
+    { }
+};
+
+struct InputEvent
+{
+    InputType type;
+    union
+    {
+        MouseEvent mouse;
+        KeyboardEvent kbd;
+    };
+    int action;
+    int mods;
+
+    InputEvent(InputType type, MouseEvent mouse, int action = 0, int mods = 0)
+        : type(type), mouse(mouse), action(action), mods(mods)
+    { }
+
+    InputEvent(InputType type, KeyboardEvent kbd, int action = 0, int mods = 0)
+        : type(type), kbd(kbd), action(action), mods(mods)
+    { }
+
+};
 
 class InputQueue
 {
 public:
-    InputEvent get_next_event() { InputEvent tmp = queue.front(); queue.pop(); return tmp; }
-    void register_input(InputType, int, char, double, double);
+    InputEvent get_next_event() { InputEvent next = input_queue.front(); input_queue.pop(); return next; }
+    void register_kbd(int key, int scancode, int action, int mods);
+    void register_mouse_button(int button, int action, int mods);
+    void register_mouse_pos(double x, double y);
+    void register_mouse_scroll(double x, double y);
 
 private:
-    std::queue<InputEvent> queue;
+    std::queue<InputEvent> input_queue;
 };
-
 
 }
