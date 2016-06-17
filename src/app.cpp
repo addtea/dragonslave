@@ -50,10 +50,13 @@ void App::init(const AppConfig& config)
 
     glfwGetFramebufferSize(glfw_window_, &width, &height);
     window_.on_resize(width, height);
+
+    graphics_.init();
 }
 
 void App::term()
 {
+    graphics_.term();
     glfwTerminate();
 }
 
