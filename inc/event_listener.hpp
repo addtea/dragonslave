@@ -3,11 +3,11 @@
 namespace dragonslave {
 
 
-template <typename EventType>
+template <typename Event>
 class EventListener
 {
 public:
-    virtual void handle(const EventType& ev) = 0;
+    virtual void handle(const Event& ev) = 0;
 };
 
 

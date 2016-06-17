@@ -1,20 +1,29 @@
 #pragma once
 
-#include <vector>
+#include <list>
 #include "event_listener.hpp"
 
 namespace dragonslave {
 
 
-template <typename EventType>
+template <typename Event>
 class EventTarget
 {
 public:
-    void add_event_listener(EventListener<EventType> listener);
-    void remove_event_listener(EventListener<EventType> listener);
-    void emit_event();
+    void add_event_listener(EventListener<Event> listener)
+    { listeners_.push_back(listener); }
+
+    void remove_event_listener(EventListener<Event> listener)
+    { listeners_.remove(listener); }
+
+    void emit_event(const Event& ev)
+    {
+        for (EventListener<Event> listener : listeners_) {
+            listener.handle(ev);
+        }
+    }
 private:
-    std::vector<EventListener<EventType> > listeners_;
+    std::list<EventListener<Event> > listeners_;
 };
 
 
