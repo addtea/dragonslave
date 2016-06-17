@@ -5,66 +5,84 @@ namespace dragonslave {
 
 enum class InputType {
     KEYBOARD,
-    MOUSE_POS,
+    MOUSE_POSITION,
     MOUSE_BUTTON,
     MOUSE_SCROLL,
 };
 
-struct MouseEvent
+
+struct InputMouseButtonEvent
 {
-    double x = 0, y = 0;
     int button = 0;
-
-    MouseEvent(double x, double y) :
-        x(x), y(y)
-    { }
-
-    MouseEvent(int button) :
-        button(button)
+    InputMouseButtonEvent(int button)
+        : button(button)
     { }
 };
 
-struct KeyboardEvent
+
+struct InputMousePositionEvent
 {
-    int key, scancode;
-
-    KeyboardEvent(int key, int scancode)
-        : key(key), scancode(scancode)
+    double x = 0.0, y = 0.0;
+    InputMousePositionEvent(double x, double y)
+        : x(x)
+        , y(y)
     { }
 };
+
+
+struct InputMouseScrollEvent
+{
+    double x = 0.0, y = 0.0;
+    InputMouseScrollEvent(double x, double y)
+        : x(x)
+        , y(y)
+    { }
+};
+
+
+struct InputKeyboardEvent
+{
+    int key = 0, scancode = 0;
+
+    InputKeyboardEvent(int key, int scancode)
+        : key(key)
+        , scancode(scancode)
+    { }
+};
+
 
 struct InputEvent
 {
     InputType type;
     union
     {
-        MouseEvent mouse;
-        KeyboardEvent kbd;
+        InputMouseButtonEvent mouse_button;
+        InputMousePositionEvent mouse_position;
+        InputMouseScrollEvent mouse_scroll;
+        InputKeyboardEvent kbd;
     };
     int action;
     int mods;
 
-    InputEvent(InputType type, MouseEvent mouse, int action = 0, int mods = 0)
-        : type(type), mouse(mouse), action(action), mods(mods)
+    InputEvent(InputType type, int action = 0, int mods = 0)
+        : type(type)
+        , action(action)
+        , mods(mods)
     { }
-
-    InputEvent(InputType type, KeyboardEvent kbd, int action = 0, int mods = 0)
-        : type(type), kbd(kbd), action(action), mods(mods)
-    { }
-
 };
+
 
 class InputQueue
 {
 public:
-    InputEvent get_next_event() { InputEvent next = input_queue.front(); input_queue.pop(); return next; }
+    InputEvent get_next_event() { InputEvent next = input_queue_.front(); input_queue_.pop(); return next; }
     void register_kbd(int key, int scancode, int action, int mods);
     void register_mouse_button(int button, int action, int mods);
     void register_mouse_pos(double x, double y);
     void register_mouse_scroll(double x, double y);
 
 private:
-    std::queue<InputEvent> input_queue;
+    std::queue<InputEvent> input_queue_;
 };
 
 }
