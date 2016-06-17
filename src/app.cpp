@@ -39,12 +39,6 @@ void App::init(const AppConfig& config)
 
     glfwMakeContextCurrent(glfw_window_);
 
-    glewExperimental = true;
-    if (glewInit() != GLEW_OK) {
-        throw AppInitError("Failed to initialize GLEW.");
-    }
-    glGetError();
-
     glfwSetWindowUserPointer(glfw_window_, this);
 
     glfwSetCharCallback(glfw_window_, App::handle_char_);
