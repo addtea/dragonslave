@@ -2,13 +2,13 @@
 
 namespace dragonslave {
 
-template <typename EventKType>
+
+template <typename EventType>
 class EventHandler
 {
 public:
-    EventHandler();
-    virtual ~EventHandler();
-    void handle(const EventKType& ev);
+    virtual void handle(const EventType& ev) = 0;
 };
+
 
 }
