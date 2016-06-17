@@ -22,7 +22,7 @@ public:
     template <typename EventType>
     void emitEvent(const EventType& ev);
 private:
-    std::map<EventBase, std::vector<EventListener<EventBase> > > listeners;
+    std::map<EventBase, std::vector<EventListener<EventBase> > > listeners_;
 };
 
 
