@@ -1,28 +1,20 @@
 #pragma once
 
-#include <map>
 #include <vector>
 #include "event_listener.hpp"
 
 namespace dragonslave {
 
 
-class EventBase
-{
-};
-
-
+template <typename EventType>
 class EventTarget
 {
 public:
-    template <typename EventType>
-    void addEventListener(const EventType& ev, EventListener<EventType> listener);
-    template <typename EventType>
-    void removeEventListener(const EventType& ev, EventListener<EventType> listener);
-    template <typename EventType>
-    void emitEvent(const EventType& ev);
+    void add_event_listener(EventListener<EventType> listener);
+    void remove_event_listener(EventListener<EventType> listener);
+    void emit_event();
 private:
-    std::map<EventBase, std::vector<EventListener<EventBase> > > listeners_;
+    std::vector<EventListener<EventType> > listeners_;
 };
 
 
