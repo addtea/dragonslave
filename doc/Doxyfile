@@ -6,6 +6,7 @@ PROJECT_BRIEF          = "A Lina-Based Lina"
 OUTPUT_DIRECTORY       = ./doc
 OUTPUT_LANGUAGE        = English
 MARKDOWN_SUPPORT       = YES
+JAVADOC_AUTOBRIEF      = YES
 
 # Input files
 INPUT                  = ./src ./inc
@@ -43,18 +44,6 @@ ABBREVIATE_BRIEF       = "The $name class" \
                          a \
                          an \
                          the
-
-# The MULTILINE_CPP_IS_BRIEF tag can be set to YES to make doxygen treat a
-# multi-line C++ special comment block (i.e. a block of //! or /// comments) as
-# a brief description. This used to be the default behavior. The new default is
-# to treat a multi-line C++ comment block as a detailed description. Set this
-# tag to YES if you prefer the old behavior instead.
-#
-# Note that setting this tag to YES also means that rational rose comments are
-# not recognized any more.
-# The default value is: NO.
-
-MULTILINE_CPP_IS_BRIEF = NO
 
 # If the EXTRACT_ALL tag is set to YES, doxygen will assume all entities in
 # documentation are documented, even if no documentation was available. Private
