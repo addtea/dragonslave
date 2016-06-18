@@ -30,6 +30,9 @@ void Graphics::term()
     for (GLuint program : programs_) {
         glDeleteProgram(program);
     }
+
+    glDeleteVertexArrays(vertex_arrays_.size(), vertex_arrays_.data());
+    glDeleteBuffers(buffers_.size(), buffers_.data());
 }
 
 
@@ -92,6 +95,48 @@ GLuint Graphics::load_program(const std::vector<GLuint>& shaders)
 
     programs_.push_back(program);
     return program;
+}
+
+
+GLuint Graphics::create_vertex_array()
+{
+    GLuint vertex_array;
+    glGenVertexArrays(1, &vertex_array);
+    vertex_arrays_.push_back(vertex_array);
+    return vertex_array;
+}
+
+
+GLuint Graphics::create_buffer()
+{
+    GLuint buffer;
+    glGenBuffers(1, &buffer);
+    buffers_.push_back(buffer);
+    return buffer;
+}
+
+
+void Graphics::destroy_vertex_array(GLuint vertex_array)
+{
+    std::vector<GLuint>::iterator it = std::find(
+            vertex_arrays_.begin(), vertex_arrays_.end(), vertex_array);
+    if (it != vertex_arrays_.end()) {
+        GLuint buffer = *it;
+        glDeleteVertexArrays(1, &buffer);
+        vertex_arrays_.erase(it);
+    }
+}
+
+
+void Graphics::destroy_buffer(GLuint buffer)
+{
+    std::vector<GLuint>::iterator it = std::find(
+            buffers_.begin(), buffers_.end(), buffer);
+    if (it != buffers_.end()) {
+        GLuint buffer = *it;
+        glDeleteBuffers(1, &buffer);
+        buffers_.erase(it);
+    }
 }
 
 
