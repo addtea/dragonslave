@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -58,9 +59,17 @@ public:
     GLuint load_shader(GLenum type, const std::string& path);
     GLuint load_program(const std::vector<GLuint>& shaders);
 
+    GLuint create_vertex_array();
+    GLuint create_buffer();
+
+    void destroy_vertex_array(GLuint vertex_array);
+    void destroy_buffer(GLuint buffer);
+
 private:
     std::vector<GLuint> shaders_;
     std::vector<GLuint> programs_;
+    std::vector<GLuint> vertex_arrays_;
+    std::vector<GLuint> buffers_;
 };
 
 
