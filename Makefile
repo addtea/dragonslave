@@ -20,7 +20,15 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
+clean: 
+	rm -rf $(BUILD_DIR) $(TARGET)
+
+new: clean $(TARGET)
+
 doc:
 	@doxygen $(DOC_DIR)/Doxyfile
 
-.PHONY: doc
+.PHONY: 
+	clean
+	new
+	doc
