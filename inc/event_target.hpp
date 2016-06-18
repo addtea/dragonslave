@@ -10,20 +10,21 @@ template <typename Event>
 class EventTarget
 {
 public:
-    void add_event_listener(EventListener<Event> listener)
+    void add_event_listener(EventListener<Event>* listener)
     { listeners_.push_back(listener); }
 
-    void remove_event_listener(EventListener<Event> listener)
+    void remove_event_listener(EventListener<Event>* listener)
     { listeners_.remove(listener); }
 
     void emit_event(const Event& ev)
     {
-        for (EventListener<Event> listener : listeners_) {
-            listener.handle(ev);
+        for (EventListener<Event>* listener : listeners_) {
+            listener->handle(ev);
         }
     }
+
 private:
-    std::list<EventListener<Event> > listeners_;
+    std::list<EventListener<Event>*> listeners_;
 };
 
 

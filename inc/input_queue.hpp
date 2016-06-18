@@ -3,6 +3,7 @@
 
 namespace dragonslave {
 
+
 enum class InputType {
     KEYBOARD,
     MOUSE_POSITION,
@@ -14,39 +15,61 @@ enum class InputType {
 struct InputMouseButtonEvent
 {
     int button = 0;
-    InputMouseButtonEvent(int button)
-        : button(button)
+    int action = 0;
+    int mods = 0;
+    double x = 0;
+    double y = 0;
+
+    InputMouseButtonEvent(int button, int action, int mods, double x, double y)
+      : button (button)
+      , action (action)
+      , mods (mods)
+      , x (x)
+      , y (y)
     { }
 };
 
 
-struct InputMousePositionEvent
+struct InputMouseMotionEvent
 {
-    double x = 0.0, y = 0.0;
-    InputMousePositionEvent(double x, double y)
-        : x(x)
-        , y(y)
+    double x = 0.0; 
+    double y = 0.0; 
+    double dx = 0.0; 
+    double dy = 0.0;
+
+    InputMouseMotionEvent(double x, double y, double dx, double dy)
+      : x (x)
+      , y (y)
+      , dx (dx)
+      , dy (dy)
     { }
 };
 
 
 struct InputMouseScrollEvent
 {
-    double x = 0.0, y = 0.0;
-    InputMouseScrollEvent(double x, double y)
-        : x(x)
-        , y(y)
+    double dx = 0.0; 
+    double dy = 0.0;
+
+    InputMouseScrollEvent(double dx, double dy)
+      : dx (dx)
+      , dy (dy)
     { }
 };
 
 
 struct InputKeyboardEvent
 {
-    int key = 0, scancode = 0;
+    int key = 0; 
+    int scancode = 0;
+    int action = 0;
+    int mods = 0;
 
-    InputKeyboardEvent(int key, int scancode)
-        : key(key)
-        , scancode(scancode)
+    InputKeyboardEvent(int key, int scancode, int action, int mods)
+      : key (key)
+      , scancode (scancode)
+      , action (action)
+      , mods (mods)
     { }
 };
 
@@ -57,17 +80,13 @@ struct InputEvent
     union
     {
         InputMouseButtonEvent mouse_button;
-        InputMousePositionEvent mouse_position;
+        InputMouseMotionEvent mouse_motion;
         InputMouseScrollEvent mouse_scroll;
-        InputKeyboardEvent kbd;
+        InputKeyboardEvent keyboard;
     };
-    int action;
-    int mods;
 
-    InputEvent(InputType type, int action = 0, int mods = 0)
-        : type(type)
-        , action(action)
-        , mods(mods)
+    InputEvent(InputType type)
+      : type (type)
     { }
 };
 
@@ -75,14 +94,28 @@ struct InputEvent
 class InputQueue
 {
 public:
-    InputEvent get_next_event() { InputEvent next = input_queue_.front(); input_queue_.pop(); return next; }
-    void register_kbd(int key, int scancode, int action, int mods);
-    void register_mouse_button(int button, int action, int mods);
-    void register_mouse_pos(double x, double y);
-    void register_mouse_scroll(double x, double y);
+    bool has_next_event() const { return !input_queue_.empty(); }
+
+    InputEvent pop_next_event() 
+    { 
+        InputEvent next = input_queue_.front();
+        input_queue_.pop();
+        return next;
+    }
+
+    void reset();
+
+    void on_keyboard(int key, int scancode, int action, int mods);
+    void on_mouse_button(int button, int action, int mods);
+    void on_mouse_motion(double x, double y);
+    void on_mouse_scroll(double dx, double dy);
 
 private:
     std::queue<InputEvent> input_queue_;
+    bool seen_mouse_motion_ = false;
+    double mouse_x_ = -1.0;
+    double mouse_y_ = -1.0;
 };
+
 
 }
