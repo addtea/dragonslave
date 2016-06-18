@@ -1,3 +1,5 @@
 .*.sw?
 dragonslave
 .build
+doc/*
+!doc/Doxyfile

@@ -3,6 +3,7 @@ TARGET 		:= dragonslave
 SRC_DIR		:= src
 INC_DIR		:= inc
 BUILD_DIR	:= .build
+DOC_DIR		:= doc
 
 CC			:= g++
 CFLAGS		:= -O2 -std=c++11
@@ -18,3 +19,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+
+doc:
+	@doxygen $(DOC_DIR)/Doxyfile
+
+.PHONY: doc
