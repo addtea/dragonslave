@@ -61,15 +61,14 @@ public:
 
     GLuint create_vertex_array();
     GLuint create_buffer();
-
-    void destroy_vertex_array(GLuint vertex_array);
-    void destroy_buffer(GLuint buffer);
+    GLuint create_texture(); 
 
 private:
     std::vector<GLuint> shaders_;
     std::vector<GLuint> programs_;
     std::vector<GLuint> vertex_arrays_;
     std::vector<GLuint> buffers_;
+    std::vector<GLuint> textures_;
 };
 
 

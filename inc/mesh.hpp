@@ -28,22 +28,16 @@ public:
     std::vector<glm::mat4> bone_weights;
     std::vector<GLuint> indices;
 
-    GLuint VAO;
-    GLuint VBO_positions;
-    GLuint VBO_normals;
-    GLuint VBO_tex_coords;
-    GLuint EBO;
+    GLuint vao = 0u;
+    GLuint vbo_positions  = 0u;
+    GLuint vbo_normals    = 0u;
+    GLuint vbo_tex_coords = 0u;
+    GLuint ebo = 0u;
 
-    Mesh(Graphics& graphics)
-    : graphics_(graphics)
-    { }
-    virtual ~Mesh() { };
+    Mesh();
+    virtual ~Mesh();
 
-    void upload();
-
-private:
-    Graphics& graphics_;
-
+    void upload(Graphics& graphics);
 };
 
 
