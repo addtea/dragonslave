@@ -9,16 +9,18 @@ Input::Input() { }
 Input::~Input() { }
 
 
-void Input::init(GLFWwindow* glfw_window)
+void Input::initiate(GLFWwindow* glfw_window)
 {
     glfw_window_ = glfw_window;
     queue_.reset();
 }
 
-void Input::term()
+
+void Input::terminate()
 {
     glfw_window_ = nullptr;
 }
+
 
 void Input::on_char(unsigned int codepoint) { }
 

@@ -12,7 +12,7 @@ Graphics::Graphics() { }
 Graphics::~Graphics() { }
 
 
-void Graphics::init() 
+void Graphics::initiate() 
 { 
     glewExperimental = true;
     if (glewInit() != GLEW_OK) {
@@ -22,7 +22,7 @@ void Graphics::init()
 }
 
 
-void Graphics::term()
+void Graphics::terminate()
 {
     for (GLuint shader : shaders_) {
         glDeleteShader(shader);
@@ -41,7 +41,7 @@ void Graphics::term()
 GLuint Graphics::load_shader(GLenum type, const std::string& path)
 {
     std::ifstream in (path);
-    if (!in.isopen()) {
+    if (!in.is_open()) {
         throw FileNotFoundError(path); 
     }
     GLuint shader = glCreateShader(type);

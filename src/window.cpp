@@ -9,13 +9,13 @@ Window::Window() { }
 Window::~Window() { }
 
 
-void Window::init(GLFWwindow* glfw_window)
+void Window::initiate(GLFWwindow* glfw_window)
 {
     glfw_window_ = glfw_window;
 }
 
 
-void Window::term()
+void Window::terminate()
 {
     glfw_window_ = nullptr;
 }

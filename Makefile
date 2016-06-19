@@ -8,7 +8,7 @@ DOC_DIR		:= doc
 CC			:= g++
 CFLAGS		:= -O2 -std=c++14
 INCS		:= -I$(INC_DIR)
-LIBS		:= -lGL -lGLEW -lglfw -lassimp
+LIBS		:= -lGL -lGLEW -lglfw -lassimp -lfreeimage
 SOURCES		:= $(shell find $(SRC_DIR) -name '*.cpp' -type 'f')
 HEADERS		:= $(shell find $(INC_DIR) -name '*.hpp' -type 'f')
 OBJECTS		:= $(SOURCES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)

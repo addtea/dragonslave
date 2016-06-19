@@ -53,8 +53,8 @@ public:
     Graphics();
     virtual ~Graphics();
 
-    void init();
-    void term();
+    void initiate();
+    void terminate();
 
     GLuint load_shader(GLenum type, const std::string& path);
     GLuint load_program(const std::vector<GLuint>& shaders);

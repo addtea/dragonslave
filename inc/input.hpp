@@ -14,8 +14,8 @@ public:
     Input();
     virtual ~Input();
 
-    void init(GLFWwindow* glfw_window);
-    void term();
+    void initiate(GLFWwindow* glfw_window);
+    void terminate();
 
     InputQueue& get_queue() { return queue_; }
 

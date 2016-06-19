@@ -10,7 +10,7 @@ class FatalError : public std::runtime_error
 {
 public:
     FatalError(const std::string& type, const std::string& message)
-      : std::runtime_error(build_runtime_error_what(type, message))
+      : std::runtime_error(build_what_(type, message))
       , type_ (type)
       , message_ (message)
     { }
@@ -21,7 +21,7 @@ public:
     inline const std::string& get_message() const { return message_; }
 
 private: 
-    static std::string build_runtime_error_what(const std::string& type, const std::string& message) 
+    static std::string build_what_(const std::string& type, const std::string& message) 
     {
         return type + ": " + message;
     }
@@ -34,9 +34,21 @@ private:
 class FileNotFoundError : public FatalError
 {
 public:
-    NotFoundError(const std::string& path) 
-      : FatalError ("File \"" + path + "\" does not exist.");
+    FileNotFoundError(const std::string& path) 
+      : FatalError ("NotFoundError", 
+                    "File \"" + path + "\" does not exist.")
     { }
-}
+};
+
+
+class DuplicateError : public FatalError
+{
+public:
+    DuplicateError(const std::string& type, const std::string& name) 
+      : FatalError ("DuplicateError",
+                    type + " name, \"" + name + "\" is already taken.")
+    { }
+};
+
 
 }
