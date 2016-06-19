@@ -34,14 +34,17 @@ int main(int argc, char** argv)
         dragonslave::InputQueue& input_queue = app.get_input().get_queue();
         while (is_running) {
             app.poll();
-            while (input_queue.has_next_event()) {
-                dragonslave::InputEvent ev = input_queue.pop_next_event(); 
-                if (ev.type == dragonslave::InputType::KEYBOARD) {
-                    if (ev.keyboard.action == GLFW_PRESS &&
-                            ev.keyboard.key == GLFW_KEY_ESCAPE) {
+            while (input_queue.has_events()) {
+                const dragonslave::InputEvent* ev = input_queue.next_event(); 
+                if (ev->type == dragonslave::InputEventType::KEYBOARD) {
+                    const dragonslave::KeyboardInputEvent* kev =
+                        static_cast<const dragonslave::KeyboardInputEvent*>(ev);
+                    if (kev->action == GLFW_PRESS &&
+                            kev->key == GLFW_KEY_ESCAPE) {
                         is_running = false;
                     }
                 }
+                input_queue.pop_event();
             }
         }
 
