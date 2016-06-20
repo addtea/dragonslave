@@ -11,7 +11,7 @@
 namespace dragonslave {
 
 
-class Geode
+class Geometry
 {
 public:
 
@@ -34,8 +34,8 @@ public:
     GLuint vbo_tex_coords = 0u;
     GLuint ebo = 0u;
 
-    Geode();
-    virtual ~Geode();
+    Geometry();
+    virtual ~Geometry();
 
     void upload(Graphics* graphics);
 };

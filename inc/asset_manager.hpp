@@ -1,6 +1,6 @@
 #pragma once
 
-#include "geode_manager.hpp"
+#include "geometry_manager.hpp"
 #include "material_manager.hpp"
 #include "model_manager.hpp"
 
@@ -12,7 +12,7 @@ namespace dragonslave {
 class AssetManager 
 {
 public:
-    GeodeManager geode;
+    GeometryManager geometry;
     MaterialManager material;
     ModelManager model;
 

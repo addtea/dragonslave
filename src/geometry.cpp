@@ -1,15 +1,15 @@
-#include "geode.hpp"
+#include "geometry.hpp"
 
 namespace dragonslave {
 
 
-Geode::Geode() { }
+Geometry::Geometry() { }
 
 
-Geode::~Geode() { }
+Geometry::~Geometry() { }
 
 
-void Geode::upload(Graphics* graphics)
+void Geometry::upload(Graphics* graphics)
 {
     vao = graphics->create_vertex_array();
     vbo_positions = graphics->create_buffer();

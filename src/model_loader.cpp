@@ -11,12 +11,12 @@ ModelLoader::~ModelLoader() { }
 
 void ModelLoader::initiate(
         Graphics* graphics,
-        GeodeManager* geode_manager,
+        GeometryManager* geometry_manager,
         MaterialManager* material_manager,
         ImageManager* image_manager)
 {
     graphics_ = graphics;
-    geode_manager_ = geode_manager;
+    geometry_manager_ = geometry_manager;
     material_manager_ = material_manager;
     image_manager_ = image_manager;
 }
@@ -25,7 +25,7 @@ void ModelLoader::initiate(
 void ModelLoader::terminate() 
 { 
     graphics_ = nullptr;
-    geode_manager_ = nullptr;
+    geometry_manager_ = nullptr;
     material_manager_ = nullptr;
     image_manager_ = nullptr;
 }
@@ -49,21 +49,21 @@ void ModelLoader::load_model_from_file(
 }
 
 
-void ModelLoader::process_geode_(aiMesh* ai_mesh, Geode& geode)
+void ModelLoader::process_geometry_(aiMesh* ai_mesh, Geometry& geometry)
 {
-    geode.has_normals = true;
-    geode.has_tex_coords = ai_mesh->mTextureCoords[0] != nullptr;
+    geometry.has_normals = true;
+    geometry.has_tex_coords = ai_mesh->mTextureCoords[0] != nullptr;
     for (int i = 0; i < ai_mesh->mNumVertices; i++) {
-        geode.positions.emplace_back(
+        geometry.positions.emplace_back(
             static_cast<float>(ai_mesh->mVertices[i].x),
             static_cast<float>(ai_mesh->mVertices[i].y),
             static_cast<float>(ai_mesh->mVertices[i].z));
-        geode.normals.emplace_back(
+        geometry.normals.emplace_back(
             static_cast<float>(ai_mesh->mNormals[i].x),
             static_cast<float>(ai_mesh->mNormals[i].y),
             static_cast<float>(ai_mesh->mNormals[i].z));
-        if (geode.has_tex_coords) {
-            geode.tex_coords.emplace_back(
+        if (geometry.has_tex_coords) {
+            geometry.tex_coords.emplace_back(
                 static_cast<float>(ai_mesh->mTextureCoords[0][i].x),
                 static_cast<float>(ai_mesh->mTextureCoords[0][i].y));
         }
@@ -73,10 +73,10 @@ void ModelLoader::process_geode_(aiMesh* ai_mesh, Geode& geode)
     {
         aiFace& face = ai_mesh->mFaces[i];
         for(int j = 0; j < face.mNumIndices; j++)
-            geode.indices.push_back(face.mIndices[j]);
+            geometry.indices.push_back(face.mIndices[j]);
     }
 
-    geode.upload(graphics_);
+    geometry.upload(graphics_);
 }
 
 
@@ -166,14 +166,14 @@ void ModelLoader::load_meshes_(
 {
     for (int i = 0; i < scene->mNumMeshes; i++) {
         aiMesh* ai_mesh = scene->mMeshes[i];
-        Geode& geode = geode_manager_->create_geode();
-        process_geode_(ai_mesh, geode);
+        Geometry& geometry = geometry_manager_->create_geometry();
+        process_geometry_(ai_mesh, geometry);
         
         Material* material = nullptr;
         if (ai_mesh->mMaterialIndex >= 0) {
             material = materials.at(ai_mesh->mMaterialIndex);
         }
-        model.meshes.emplace_back(&geode, material);
+        model.meshes.emplace_back(&geometry, material);
     }
 }
 

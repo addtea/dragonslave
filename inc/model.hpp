@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "geode.hpp"
+#include "geometry.hpp"
 #include "material.hpp"
 
 namespace dragonslave {
@@ -8,11 +8,11 @@ namespace dragonslave {
 
 struct Mesh
 {
-    Geode* geode;
+    Geometry* geometry;
     Material* material;
 
-    Mesh(Geode* geode, Material* material)
-      : geode (geode)
+    Mesh(Geometry* geometry, Material* material)
+      : geometry (geometry)
       , material (material)
     { }
 };
