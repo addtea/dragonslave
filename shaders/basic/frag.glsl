@@ -1,10 +1,33 @@
 #version 330 core
 
-uniform vec4 color;
+in VS_OUT
+{
+    smooth vec3 position;
+    smooth vec3 normal;
+    smooth vec2 tex_coord;
+} fs_in;
 
-out vec4 frag_color;
+uniform struct Material
+{
+    bool has_ambient_map;
+    bool has_diffuse_map;
+    bool has_specular_map;
+    vec3 ambient_color;
+    vec3 diffuse_color;
+    vec3 specular_color;
+    float shininess;
+    sampler2D ambient_map;
+    sampler2D diffuse_map;
+    sampler2D specular_map;
+} material;
+
+out vec4 frag_out;
 
 void main()
 {
-    color = frag_color;    
+    frag_out = vec4(material.diffuse_color, 1);
+    if (material.has_diffuse_map) {
+        frag_out = texture(material.diffuse_map, fs_in.tex_coord);
+    }
+    frag_out = frag_out * clamp(dot(fs_in.normal, vec3(0, 0, 1)), 0, 1);
 }

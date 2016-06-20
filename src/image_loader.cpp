@@ -49,6 +49,7 @@ void ImageLoader::load_image_from_file(const std::string& path, Image& image)
     GLubyte* pixels = FreeImage_GetBits(bitmap);
 
     image.texture = graphics_->create_texture();
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, image.texture);
     
     glTexImage2D(
@@ -57,6 +58,8 @@ void ImageLoader::load_image_from_file(const std::string& path, Image& image)
         image.width, image.height, 
         0, GL_BGRA, 
         GL_UNSIGNED_BYTE, pixels);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     FreeImage_Unload(bitmap);
     

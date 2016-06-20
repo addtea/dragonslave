@@ -18,7 +18,6 @@ public:
     bool has_ambient_map = false;
     bool has_diffuse_map = false;
     bool has_specular_map = false;
-
     glm::vec3 ambient_color {0.f, 0.f, 0.f};
     glm::vec3 diffuse_color {1.f, 1.f, 1.f};
     glm::vec3 specular_color {0.f, 0.f, 0.f};

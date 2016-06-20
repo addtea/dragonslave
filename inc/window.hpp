@@ -32,6 +32,8 @@ public:
     int get_width() const { return width_; }
     int get_height() const { return height_; }
 
+    void swap_buffers();
+
     EventTarget<WindowResizeEvent>& get_resize_target()
     { return resize_target_; }
 

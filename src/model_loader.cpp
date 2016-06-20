@@ -36,7 +36,7 @@ void ModelLoader::load_model_from_file(
         Model& model)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         // TODO(eugene): Create error for unloaded file
     }
@@ -173,7 +173,7 @@ void ModelLoader::load_meshes_(
         if (ai_mesh->mMaterialIndex >= 0) {
             material = materials.at(ai_mesh->mMaterialIndex);
         }
-        model.add_mesh(&geode, material);
+        model.meshes.emplace_back(&geode, material);
     }
 }
 

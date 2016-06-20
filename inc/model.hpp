@@ -19,16 +19,10 @@ struct Mesh
 
 class Model {
 public:
+    std::vector<Mesh> meshes;
+
     Model();
     virtual ~Model();
-
-    const std::vector<Mesh>& get_meshes() const
-    { return meshes_; }
-
-    void add_mesh(Geode* geode, Material* material);
-    
-private:
-    std::vector<Mesh> meshes_;
 };
 
 
