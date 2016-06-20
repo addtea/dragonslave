@@ -56,7 +56,7 @@ void App::initiate(const AppConfig& config)
     window.initiate(glfw_window_);
     input.initiate(glfw_window_);
     graphics.initiate();
-    assets.initiate(&graphics);
+    asset.initiate(&graphics);
 }
 
 
@@ -65,6 +65,7 @@ void App::terminate()
     window.terminate();
     input.terminate();
     graphics.terminate();
+    asset.terminate();
 
     glfwTerminate();
 }

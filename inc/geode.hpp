@@ -37,7 +37,7 @@ public:
     Geode();
     virtual ~Geode();
 
-    void upload(Graphics& graphics);
+    void upload(Graphics* graphics);
 };
 
 

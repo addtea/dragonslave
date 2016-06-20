@@ -9,13 +9,13 @@ Geode::Geode() { }
 Geode::~Geode() { }
 
 
-void Geode::upload(Graphics& graphics)
+void Geode::upload(Graphics* graphics)
 {
-    vao = graphics.create_vertex_array();
-    vbo_positions = graphics.create_buffer();
-    vbo_normals = graphics.create_buffer();
-    vbo_tex_coords = graphics.create_buffer();
-    ebo = graphics.create_buffer();
+    vao = graphics->create_vertex_array();
+    vbo_positions = graphics->create_buffer();
+    vbo_normals = graphics->create_buffer();
+    vbo_tex_coords = graphics->create_buffer();
+    ebo = graphics->create_buffer();
 
     glBindVertexArray(vao);
 
@@ -36,12 +36,12 @@ void Geode::upload(Graphics& graphics)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Tex coords
+    glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tex_coords);
     glBufferData(
         GL_ARRAY_BUFFER, tex_coords.size() * sizeof(glm::vec2),
         tex_coords.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(2);
 
     // Elements
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

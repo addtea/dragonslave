@@ -35,7 +35,7 @@ class FileNotFoundError : public FatalError
 {
 public:
     FileNotFoundError(const std::string& path) 
-      : FatalError ("NotFoundError", 
+      : FatalError ("FileNotFoundError", 
                     "File \"" + path + "\" does not exist.")
     { }
 };

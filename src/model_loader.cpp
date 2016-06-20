@@ -75,6 +75,8 @@ void ModelLoader::process_geode_(aiMesh* ai_mesh, Geode& geode)
         for(int j = 0; j < face.mNumIndices; j++)
             geode.indices.push_back(face.mIndices[j]);
     }
+
+    geode.upload(graphics_);
 }
 
 

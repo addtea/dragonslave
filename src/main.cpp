@@ -31,6 +31,8 @@ int main(int argc, char** argv)
         app.window.get_resize_target().add_event_listener(
             &ews);
 
+        dragonslave::Model& lina_model = app.asset.model.load_named_model("Lina", "assets/models/Lina/lina.dae");
+
         bool is_running = true;
         dragonslave::InputQueue& input_queue = app.input.get_queue();
         while (is_running) {

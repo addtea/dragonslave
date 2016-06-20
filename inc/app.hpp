@@ -39,7 +39,7 @@ public:
 class App
 {
 public:
-    AssetManager assets;
+    AssetManager asset;
     Graphics graphics;
     Input input;
     Window window;
