@@ -9,7 +9,7 @@ App::App() { }
 App::~App() { }
 
 
-void App::init(const AppConfig& config)
+void App::initiate(const AppConfig& config)
 {
     if (!glfwInit()) {
         throw AppInitError("Failed to initialize GLFW.");
@@ -51,17 +51,22 @@ void App::init(const AppConfig& config)
     glfwSetFramebufferSizeCallback(glfw_window_, App::handle_framebuffer_size_);
 
     glfwGetFramebufferSize(glfw_window_, &width, &height);
-    window_.on_resize(width, height);
+    window.on_resize(width, height);
 
-    window_.init(glfw_window_);
-    input_.init(glfw_window_);
-    graphics_.init();
+    window.initiate(glfw_window_);
+    input.initiate(glfw_window_);
+    graphics.initiate();
+    asset.initiate(&graphics);
 }
 
 
-void App::term()
+void App::terminate()
 {
-    graphics_.term();
+    window.terminate();
+    input.terminate();
+    graphics.terminate();
+    asset.terminate();
+
     glfwTerminate();
 }
 
@@ -75,42 +80,42 @@ void App::poll()
 void App::handle_char_(GLFWwindow* window, unsigned int codepoint)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input_.on_char(codepoint);
+    app->input.on_char(codepoint);
 }
 
 
 void App::handle_key_(GLFWwindow* window, int key, int scancode, int action, int mods)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input_.on_key(key, scancode, action, mods);
+    app->input.on_key(key, scancode, action, mods);
 }
 
 
 void App::handle_cursor_pos_(GLFWwindow* window, double x, double y) 
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input_.on_cursor_pos(x, y);
+    app->input.on_cursor_pos(x, y);
 }
 
 
 void App::handle_mouse_button_(GLFWwindow* window, int button, int action, int mods)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input_.on_mouse_button(button, action, mods);
+    app->input.on_mouse_button(button, action, mods);
 }
 
 
 void App::handle_scroll_(GLFWwindow* window, double dx, double dy)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input_.on_scroll(dx, dy);
+    app->input.on_scroll(dx, dy);
 }
 
 
 void App::handle_framebuffer_size_(GLFWwindow* window, int width, int height)
 { 
     App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->window_.on_resize(width, height);
+    app->window.on_resize(width, height);
 }
 
 

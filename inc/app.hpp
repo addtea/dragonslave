@@ -3,11 +3,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "asset_manager.hpp"
 #include "error.hpp"
-#include "window.hpp"
-#include "input.hpp"
 #include "graphics.hpp"
-
+#include "input.hpp"
+#include "window.hpp"
 
 namespace dragonslave {
 
@@ -39,17 +39,18 @@ public:
 class App
 {
 public:
+    AssetManager asset;
+    Graphics graphics;
+    Input input;
+    Window window;
+
     App();
     virtual ~App();
      
-    void init(const AppConfig& config);
-    void term();
+    void initiate(const AppConfig& config);
+    void terminate();
 
     void poll();
-
-    inline Window& get_window() { return window_; }
-    inline Input& get_input() { return input_; }
-    inline Graphics& get_graphics() { return graphics_; }
 
 private:
     static void handle_char_(GLFWwindow* window, unsigned int code_point);
@@ -60,10 +61,6 @@ private:
     static void handle_framebuffer_size_(GLFWwindow* window, int width, int height);
 
     GLFWwindow* glfw_window_ = nullptr;
-
-    Window window_;
-    Input input_;
-    Graphics graphics_;
 };
 
 

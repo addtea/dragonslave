@@ -26,8 +26,8 @@ public:
     Window();
     virtual ~Window();
 
-    void init(GLFWwindow* glfw_window);
-    void term();
+    void initiate(GLFWwindow* glfw_window);
+    void terminate();
 
     int get_width() const { return width_; }
     int get_height() const { return height_; }

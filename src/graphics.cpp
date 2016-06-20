@@ -1,5 +1,6 @@
 #include <fstream>
 
+#include "error.hpp"
 #include "graphics.hpp"
 
 namespace dragonslave {
@@ -11,7 +12,7 @@ Graphics::Graphics() { }
 Graphics::~Graphics() { }
 
 
-void Graphics::init() 
+void Graphics::initiate() 
 { 
     glewExperimental = true;
     if (glewInit() != GLEW_OK) {
@@ -21,7 +22,7 @@ void Graphics::init()
 }
 
 
-void Graphics::term()
+void Graphics::terminate()
 {
     for (GLuint shader : shaders_) {
         glDeleteShader(shader);
@@ -33,12 +34,16 @@ void Graphics::term()
 
     glDeleteVertexArrays(vertex_arrays_.size(), vertex_arrays_.data());
     glDeleteBuffers(buffers_.size(), buffers_.data());
+    glDeleteTextures(textures_.size(), textures_.data());
 }
 
 
 GLuint Graphics::load_shader(GLenum type, const std::string& path)
 {
     std::ifstream in (path);
+    if (!in.is_open()) {
+        throw FileNotFoundError(path); 
+    }
     GLuint shader = glCreateShader(type);
     int file_size = 0;
     in.seekg(0, std::ios::end);
@@ -116,27 +121,12 @@ GLuint Graphics::create_buffer()
 }
 
 
-void Graphics::destroy_vertex_array(GLuint vertex_array)
+GLuint Graphics::create_texture()
 {
-    std::vector<GLuint>::iterator it = std::find(
-            vertex_arrays_.begin(), vertex_arrays_.end(), vertex_array);
-    if (it != vertex_arrays_.end()) {
-        GLuint buffer = *it;
-        glDeleteVertexArrays(1, &buffer);
-        vertex_arrays_.erase(it);
-    }
-}
-
-
-void Graphics::destroy_buffer(GLuint buffer)
-{
-    std::vector<GLuint>::iterator it = std::find(
-            buffers_.begin(), buffers_.end(), buffer);
-    if (it != buffers_.end()) {
-        GLuint buffer = *it;
-        glDeleteBuffers(1, &buffer);
-        buffers_.erase(it);
-    }
+    GLuint texture;
+    glGenTextures(1, &texture);
+    textures_.push_back(texture);
+    return texture;
 }
 
 
