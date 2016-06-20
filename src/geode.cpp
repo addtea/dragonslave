@@ -33,7 +33,7 @@ void Geode::upload(Graphics* graphics)
     glBufferData(
         GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3),
         normals.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 0, 0);
 
     // Tex coords
     glEnableVertexAttribArray(2);
@@ -41,7 +41,7 @@ void Geode::upload(Graphics* graphics)
     glBufferData(
         GL_ARRAY_BUFFER, tex_coords.size() * sizeof(glm::vec2),
         tex_coords.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Elements
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

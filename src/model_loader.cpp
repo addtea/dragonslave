@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "model_loader.hpp"
 
 namespace dragonslave {
@@ -38,7 +36,7 @@ void ModelLoader::load_model_from_file(
         Model& model)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         // TODO(eugene): Create error for unloaded file
     }
@@ -60,10 +58,6 @@ void ModelLoader::process_geode_(aiMesh* ai_mesh, Geode& geode)
             static_cast<float>(ai_mesh->mVertices[i].x),
             static_cast<float>(ai_mesh->mVertices[i].y),
             static_cast<float>(ai_mesh->mVertices[i].z));
-        std::cout 
-            << geode.positions.back().x << " "
-            << geode.positions.back().y << " "
-            << geode.positions.back().z << std::endl;
         geode.normals.emplace_back(
             static_cast<float>(ai_mesh->mNormals[i].x),
             static_cast<float>(ai_mesh->mNormals[i].y),

@@ -44,9 +44,9 @@ int main(int argc, char** argv)
 
         glm::mat4 projection;
         glm::mat4 view = glm::lookAt(
-            glm::vec3 {0.f, 2.f, 10.f},
+            glm::vec3 {0.f, -10.f, 0.f},
             glm::vec3 {0.f, 0.f, 0.f},
-            glm::vec3 {0.f, 1.f, 0.f});
+            glm::vec3 {0.f, 0.f, 1.f});
 
         ViewUpdater vu (projection);
 
@@ -73,15 +73,16 @@ int main(int argc, char** argv)
             glGetUniformLocation(program, "inverse_transpose_world_view");
         GLint world_view_projection_loc = 
             glGetUniformLocation(program, "world_view_projection");
-        GLint material_has_diffuse_map_loc = glGetUniformLocation(program, "has_diffuse_map");
-        GLint material_diffuse_color_loc = glGetUniformLocation(program, "diffuse_color");
-        GLint material_diffuse_map_loc = glGetUniformLocation(program, "diffuse_map");
+        GLint material_has_diffuse_map_loc = glGetUniformLocation(program, "material.has_diffuse_map");
+        GLint material_diffuse_color_loc = glGetUniformLocation(program, "material.diffuse_color");
+        GLint material_diffuse_map_loc = glGetUniformLocation(program, "material.diffuse_map");
 
         glEnable(GL_DEPTH_TEST);
 
         bool is_running = true;
         dragonslave::InputQueue& input_queue = app.input.get_queue();
         while (is_running) {
+            while (int error = glGetError()) { std::cout << "GL error " << error << std::endl; }
             app.poll();
             while (input_queue.has_events()) {
                 const dragonslave::InputEvent* ev = input_queue.next_event(); 
@@ -100,7 +101,7 @@ int main(int argc, char** argv)
 
             glm::mat4 world_view = view;
             glm::mat4 inverse_transpose_world_view = glm::transpose(glm::inverse(view));
-            glm::mat4 world_view_projection = view * projection;
+            glm::mat4 world_view_projection = projection * view;
 
             glUseProgram(program);
             glUniformMatrix4fv(world_view_loc, 1, GL_FALSE,  glm::value_ptr(world_view));
@@ -114,12 +115,11 @@ int main(int argc, char** argv)
             int mesh_idx = 0;
             for (const dragonslave::Mesh& mesh : lina_model.meshes) {
                 glUniform1i(material_has_diffuse_map_loc, mesh.material->has_diffuse_map);
+                glUniform3fv(material_diffuse_color_loc, 1, glm::value_ptr(mesh.material->diffuse_color));
                 if (mesh.material->has_diffuse_map) {
                     glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, mesh.material->diffuse_map);
                     glUniform1i(material_diffuse_map_loc, 0);
-                } else {
-                    glUniform3fv(material_diffuse_color_loc, 1, glm::value_ptr(mesh.material->diffuse_color));
                 }
                 glBindVertexArray(mesh.geode->vao);
                 glDrawElements(GL_TRIANGLES, mesh.geode->indices.size(), GL_UNSIGNED_INT, 0);
