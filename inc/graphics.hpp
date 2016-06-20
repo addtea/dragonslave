@@ -21,29 +21,23 @@ public:
 
 class ShaderCompileError : public FatalError {
 public:
+    std::string log;
+
     ShaderCompileError(const std::string& path, const std::string& log) 
       : FatalError("ShaderCompileError", "Failed to compile shader, \"" + path + "\"")
-      , log_ (log)
+      , log (log)
     { }
-
-    const std::string& get_log() const { return log_; }
-
-private:
-    std::string log_;
 };
 
 
 class ProgramLinkError : public FatalError {
 public:
+    std::string log;
+
     ProgramLinkError(const std::string& log) 
       : FatalError("ProgramLinkError", "Failed to link program")
-      , log_ (log)
+      , log (log)
     { }
-
-    const std::string& get_log() const { return log_; }
-
-private:
-    std::string log_;
 };
 
 

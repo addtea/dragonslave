@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "model_loader.hpp"
 
 namespace dragonslave {
@@ -58,6 +60,10 @@ void ModelLoader::process_geode_(aiMesh* ai_mesh, Geode& geode)
             static_cast<float>(ai_mesh->mVertices[i].x),
             static_cast<float>(ai_mesh->mVertices[i].y),
             static_cast<float>(ai_mesh->mVertices[i].z));
+        std::cout 
+            << geode.positions.back().x << " "
+            << geode.positions.back().y << " "
+            << geode.positions.back().z << std::endl;
         geode.normals.emplace_back(
             static_cast<float>(ai_mesh->mNormals[i].x),
             static_cast<float>(ai_mesh->mNormals[i].y),
@@ -173,7 +179,7 @@ void ModelLoader::load_meshes_(
         if (ai_mesh->mMaterialIndex >= 0) {
             material = materials.at(ai_mesh->mMaterialIndex);
         }
-        model.add_mesh(&geode, material);
+        model.meshes.emplace_back(&geode, material);
     }
 }
 

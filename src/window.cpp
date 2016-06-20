@@ -21,6 +21,12 @@ void Window::terminate()
 }
 
 
+void Window::swap_buffers()
+{
+    glfwSwapBuffers(glfw_window_);
+}
+
+
 void Window::on_resize(int width, int height)
 {
     width_ = width;

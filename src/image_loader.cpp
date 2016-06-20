@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <FreeImage.h>
 
 #include "error.hpp"
