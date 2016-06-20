@@ -40,15 +40,16 @@ int main(int argc, char** argv)
         dragonslave::AppConfig app_config;
         app_config.title = "Lina is a cute";
         app_config.resizable = true;
-        app.initiate(app_config);
 
         glm::mat4 projection;
+        ViewUpdater vu (projection);
+
+        app.initiate(app_config);
+
         glm::mat4 view = glm::lookAt(
             glm::vec3 {0.f, -10.f, 0.f},
             glm::vec3 {0.f, 0.f, 0.f},
             glm::vec3 {0.f, 0.f, 1.f});
-
-        ViewUpdater vu (projection);
 
         app.window.get_resize_target().add_event_listener(&vu);
 
@@ -121,8 +122,8 @@ int main(int argc, char** argv)
                     glBindTexture(GL_TEXTURE_2D, mesh.material->diffuse_map);
                     glUniform1i(material_diffuse_map_loc, 0);
                 }
-                glBindVertexArray(mesh.geode->vao);
-                glDrawElements(GL_TRIANGLES, mesh.geode->indices.size(), GL_UNSIGNED_INT, 0);
+                glBindVertexArray(mesh.geometry->vao);
+                glDrawElements(GL_TRIANGLES, mesh.geometry->indices.size(), GL_UNSIGNED_INT, 0);
             }
 
             app.window.swap_buffers();

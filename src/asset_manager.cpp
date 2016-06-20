@@ -15,7 +15,7 @@ void AssetManager::initiate(Graphics* graphics)
         graphics);
     model_loader_.initiate(
         graphics,
-        &geode,
+        &geometry,
         &material,
         &image);
     model.set_loader(&model_loader_);
