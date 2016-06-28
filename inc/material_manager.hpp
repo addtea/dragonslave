@@ -1,8 +1,7 @@
 #pragma once
 
 #include <list>
-#include <unordered_map>
-
+#include "string_manager.hpp"
 #include "material.hpp"
 
 namespace dragonslave {
@@ -12,21 +11,16 @@ class MaterialManager
 {
 public:
     MaterialManager();
-    ~MaterialManager();
+    virtual ~MaterialManager();
 
-    Material& create_material();
-    Material& create_named_material(const std::string& name);
+    void initialize();
+    void terminate();
 
-    Material* get_material(const std::string& name);
+    Material* create_material();
+    void destroy_material(Material* material);
 
-private:    
-    std::unordered_map<
-            std::string,
-            std::list<Material>::iterator>
-        material_lookup_;
+private:
     std::list<Material> materials_;
-
-    std::list<Material>::iterator create_material_it_();
 };
 
 

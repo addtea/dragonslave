@@ -1,121 +1,134 @@
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "app.hpp"
+#include "log.hpp"
+#include "shaders/basic_shader.hpp"
 
 namespace dragonslave {
 
 
-App::App() { } 
+App::App() { }
 
 
 App::~App() { }
 
 
-void App::initiate(const AppConfig& config)
+void App::run()
 {
-    if (!glfwInit()) {
-        throw AppInitError("Failed to initialize GLFW.");
+    init_();
+    setup_scene_();
+
+    glEnable(GL_DEPTH_TEST);
+    is_running_ = true;
+    while (is_running_ && !window.should_close()) {
+        while (int error = glGetError()) { 
+            LOG(ERROR) << "GL error " << error;
+        }
+        poll_();
+        input.flush_events();
+
+        scene.update();
+
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        scene_renderer.render();
+
+        window.swap_buffers();
     }
 
-    int width = config.width;
-    int height = config.height;
-
-    GLFWmonitor* monitor = nullptr;
-
-    if (config.fullscreen) {
-        monitor = glfwGetPrimaryMonitor();
-    }
-
-    glfwWindowHint(GLFW_VISIBLE, config.shown ? 1 : 0);
-    glfwWindowHint(GLFW_DECORATED, !config.borderless ? 1 : 0);
-    glfwWindowHint(GLFW_RESIZABLE, config.resizable ? 1 : 0);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, config.double_buffered ? 1 : 0);
-
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-    glfw_window_ = glfwCreateWindow(width, height, config.title.c_str(), monitor, nullptr);
-
-    if (!glfw_window_) {
-        throw AppInitError("Failed to create GLFW window.");
-    }
-
-    glfwMakeContextCurrent(glfw_window_);
-
-    glfwSetWindowUserPointer(glfw_window_, this);
-
-    glfwSetCharCallback(glfw_window_, App::handle_char_);
-    glfwSetKeyCallback(glfw_window_, App::handle_key_);
-    glfwSetCursorPosCallback(glfw_window_, App::handle_cursor_pos_);
-    glfwSetMouseButtonCallback(glfw_window_, App::handle_mouse_button_);
-    glfwSetScrollCallback(glfw_window_, App::handle_scroll_);
-    glfwSetFramebufferSizeCallback(glfw_window_, App::handle_framebuffer_size_);
-
-    glfwGetFramebufferSize(glfw_window_, &width, &height);
-    window.on_resize(width, height);
-
-    window.initiate(glfw_window_);
-    input.initiate(glfw_window_);
-    graphics.initiate();
-    asset.initiate(&graphics);
+    destroy_();
 }
 
 
-void App::terminate()
+void App::init_()
 {
+    if (!glfwInit()) {
+        throw FatalError("AppInitError", "Failed to initialize GLFW");
+    }
+
+    GLFormat gl_format;
+    WindowConfig window_config;
+    window_config.title = "Game";
+
+    input.add_handler(this);
+
+    window.initialize(&input, gl_format, window_config);
+    gc.initialize(&window);
+    geometry_manager.initialize(&gc);
+    material_manager.initialize();
+    image_manager.initialize(&gc, &image_loader);
+    shader_manager.initialize(&gc);
+    model_manager.initialize(
+        &geometry_manager,
+        &material_manager,
+        &image_manager,
+        &shader_manager,
+        &model_loader);
+}
+
+
+void App::setup_scene_()
+{
+    glViewport(0, 0, 800, 600);
+
+    Shader* shader = shader_manager.create_shader<BasicShader>();
+    shader_manager.set_default_shader(shader);
+
+    Geometry* geometry = geometry_manager.create_geometry();
+    geometry_generator.generate_cylinder(1.f, 2.f, 20, geometry);
+    geometry->upload();
+    Material* material = material_manager.create_material();
+    material->has_diffuse_map = false;
+    material->diffuse_color = {1.f, 1.f, 0.f};
+    Model* model = model_manager.create_model();
+    model->add_mesh(geometry, material, shader);
+    
+    SceneEntity* entity = scene.create_entity();
+    entity->model = model;
+
+    scene.get_root()->add_child(entity);
+
+    SceneCamera* camera = scene.create_camera();
+    float aspect = 800.f / 600.f;
+    camera->projection_matrix = glm::perspective(1.f, aspect, 0.1f, 1000.f);
+    scene.get_root()->add_child(camera);
+    camera->position = glm::vec3{0.f, 10.f, 20.f};
+    scene.update();
+
+    camera->look_at({0.f, 0.f, 0.f}, {0.f, 1.f, 0.f});
+    
+    scene_renderer.set_scene(&scene);
+    scene_renderer.set_active_camera(camera);
+}
+
+
+void App::destroy_() {
+    model_manager.terminate();
+    shader_manager.terminate();
+    image_manager.terminate();
+    material_manager.terminate();
+    geometry_manager.terminate();
+    gc.terminate();
     window.terminate();
-    input.terminate();
-    graphics.terminate();
-    asset.terminate();
 
     glfwTerminate();
 }
 
 
-void App::poll()
+void App::poll_() 
 {
     glfwPollEvents();
 }
 
 
-void App::handle_char_(GLFWwindow* window, unsigned int codepoint)
-{ 
-    App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input.on_char(codepoint);
-}
-
-
-void App::handle_key_(GLFWwindow* window, int key, int scancode, int action, int mods)
-{ 
-    App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input.on_key(key, scancode, action, mods);
-}
-
-
-void App::handle_cursor_pos_(GLFWwindow* window, double x, double y) 
-{ 
-    App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input.on_cursor_pos(x, y);
-}
-
-
-void App::handle_mouse_button_(GLFWwindow* window, int button, int action, int mods)
-{ 
-    App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input.on_mouse_button(button, action, mods);
-}
-
-
-void App::handle_scroll_(GLFWwindow* window, double dx, double dy)
-{ 
-    App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->input.on_scroll(dx, dy);
-}
-
-
-void App::handle_framebuffer_size_(GLFWwindow* window, int width, int height)
-{ 
-    App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
-    app->window.on_resize(width, height);
+void App::handle(const KeyboardInputEvent& event) 
+{
+    LOG(INFO) << "key event " << event.key << " " << event.action;
+    if (event.key == GLFW_KEY_ESCAPE && event.action == GLFW_RELEASE) {
+        LOG(INFO) << "quit";
+        is_running_ = false;
+    }
 }
 
 

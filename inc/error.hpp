@@ -31,24 +31,4 @@ private:
 };
 
 
-class FileNotFoundError : public FatalError
-{
-public:
-    FileNotFoundError(const std::string& path) 
-      : FatalError ("FileNotFoundError", 
-                    "File \"" + path + "\" does not exist.")
-    { }
-};
-
-
-class DuplicateError : public FatalError
-{
-public:
-    DuplicateError(const std::string& type, const std::string& name) 
-      : FatalError ("DuplicateError",
-                    type + " name, \"" + name + "\" is already taken.")
-    { }
-};
-
-
 }

@@ -1,36 +1,37 @@
 #pragma once
 
 #include <memory>
-#include <queue>
-
-#include "input_event.hpp"
+#include <mutex>
+#include <vector>
+#include "window.hpp"
+#include "input_events.hpp"
+#include "channel.hpp"
 
 namespace dragonslave {
 
 
-class InputQueue
+class InputQueue : public WindowInputBehavior
 {
 public:
     InputQueue();
     virtual ~InputQueue();
 
-    bool has_events() const;
-    const InputEvent* next_event() const;
-    void pop_event();
+    void add_handler(InputEventHandler* handler);
+    void remove_handler(InputEventHandler* handler);
+    void flush_events();
 
-    void reset();
-
-    void on_keyboard(int key, int scancode, int action, int mods);
-    void on_mouse_button(int button, int action, int mods);
-    void on_mouse_motion(double x, double y);
-    void on_mouse_scroll(double scroll_x, double scroll_y);
+    void on_key(int key, int scancode, int action, int mods) override;
+    void on_mouse_button(int button, int action, int mods)  override;
+    void on_mouse_motion(double x, double y) override;
+    void on_mouse_scroll(double scroll_x, double scroll_y) override;
 
 private:
-    std::queue<std::unique_ptr<InputEvent> > input_queue_;
-
-    bool seen_mouse_motion_ = false;
-    double mouse_x_ = -1.0;
-    double mouse_y_ = -1.0;
+    bool seen_cursor_ = false;
+    double cursor_x_ = 0.;
+    double cursor_y_ = 0.;
+    Channel<InputEventHandler, InputEvent> event_channel_;
+    std::vector<std::unique_ptr<InputEvent> > queue_;
+    std::mutex queue_mutex_;
 };
 
 

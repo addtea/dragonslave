@@ -1,6 +1,4 @@
 #include <algorithm>
-
-#include "error.hpp"
 #include "geometry_manager.hpp"
 
 namespace dragonslave {
@@ -12,44 +10,40 @@ GeometryManager::GeometryManager() { }
 GeometryManager::~GeometryManager() { }
 
 
-Geometry& GeometryManager::create_geometry()
-{
-    std::list<Geometry>::iterator it = create_geometry_it_();
-    return *it;
+void GeometryManager::initialize(GraphicsContext* gc) 
+{ 
+    gc_ = gc;
 }
 
 
-Geometry& GeometryManager::create_named_geometry(const std::string& name)
+void GeometryManager::terminate()
 {
-    std::list<Geometry>::iterator it = create_geometry_it_();
-    return *it;
-    std::unordered_map<
-            std::string,
-            std::list<Geometry>::iterator>::const_iterator
-        mit = geometry_lookup_.find(name);
-    if (mit != geometry_lookup_.end()) 
-        throw DuplicateError("Geometry", name);
-    geometry_lookup_[name] = it;
-    return *it;
+    for (Geometry& geometry : geometries_) {
+        geometry.destroy();
+    }
+    geometries_.clear();
+    gc_ = nullptr;
 }
 
 
-Geometry* GeometryManager::get_geometry(const std::string& name)
-{
-    std::unordered_map<
-            std::string,
-            std::list<Geometry>::iterator>::const_iterator
-        mit = geometry_lookup_.find(name);
-    if (mit == geometry_lookup_.end()) 
-        return nullptr;
-    return &*mit->second;
-}
-
-
-std::list<Geometry>::iterator GeometryManager::create_geometry_it_()
+Geometry* GeometryManager::create_geometry()
 {
     geometries_.emplace_back();
-    return std::prev(geometries_.end());
+    Geometry& geometry = geometries_.back();
+    geometry.create(gc_);
+    return &geometry;
+}
+
+
+void GeometryManager::destroy_geometry(Geometry* geometry)
+{
+    geometry->destroy();
+    std::remove_if(
+        geometries_.begin(),
+        geometries_.end(),
+        [=](Geometry& stored_geometry) {
+            return &stored_geometry == geometry;
+        });
 }
 
 

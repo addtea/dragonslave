@@ -5,12 +5,12 @@ INC_DIR		:= inc
 BUILD_DIR	:= .build
 DOC_DIR		:= doc
 
-CC			:= g++
-CFLAGS		:= -O2 -std=c++14
+CC			:= clang++
+CFLAGS		:= -std=c++14 -O0 -g
 INCS		:= -I$(INC_DIR)
 LIBS		:= -lGL -lGLEW -lglfw -lassimp -lfreeimage
-SOURCES		:= $(shell find $(SRC_DIR) -name '*.cpp' -type 'f')
-HEADERS		:= $(shell find $(INC_DIR) -name '*.hpp' -type 'f')
+SOURCES		:= $(shell find $(SRC_DIR) -name '*.cpp' -type 'f' | sort)
+HEADERS		:= $(shell find $(INC_DIR) -name '*.hpp' -type 'f' | sort)
 OBJECTS		:= $(SOURCES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)

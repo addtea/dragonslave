@@ -1,33 +1,28 @@
 #pragma once
 
 #include <list>
-#include <unordered_map>
-
+#include "graphics_context.hpp"
 #include "geometry.hpp"
 
 namespace dragonslave {
 
 
-class GeometryManager 
+class GeometryManager
 {
 public:
     GeometryManager();
-    ~GeometryManager();
+    virtual ~GeometryManager();
 
-    Geometry& create_geometry();
-    Geometry& create_named_geometry(const std::string& name);
+    void initialize(GraphicsContext* gc);
+    void terminate();
 
-    Geometry* get_geometry(const std::string& name);
+    Geometry* create_geometry();
+    void destroy_geometry(Geometry* geometry);
 
-private:    
-    std::unordered_map<
-            std::string,
-            std::list<Geometry>::iterator>
-        geometry_lookup_;
+private:
+    GraphicsContext* gc_;
     std::list<Geometry> geometries_;
-
-    std::list<Geometry>::iterator create_geometry_it_();
 };
 
-
+    
 }

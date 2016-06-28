@@ -1,8 +1,7 @@
 #include <FreeImage.h>
-
-#include "error.hpp"
 #include "image_loader.hpp"
-
+#include "error.hpp"
+#include "log.hpp"
 
 namespace dragonslave {
     
@@ -13,24 +12,13 @@ ImageLoader::ImageLoader() { }
 ImageLoader::~ImageLoader() { }
 
 
-void ImageLoader::initiate(Graphics* graphics)
-{
-    graphics_ = graphics;
-}
-
-
-void ImageLoader::terminate()
-{
-    graphics_ = nullptr;
-}
-
-
-void ImageLoader::load_image_from_file(const std::string& path, Image& image)
+Image ImageLoader::load(GraphicsContext* gc, const std::string& path)
 {
     FREE_IMAGE_FORMAT format = FreeImage_GetFileType(path.c_str(), 0);
 
     if (format == -1) {
-        throw FileNotFoundError(path);
+        LOG(DEBUG) << "Failed to open file, \"" << path << "\"";
+        throw FatalError("FileNotFoundError", "Failed to open file");
     }
 
     // TODO(eugene): Check if image format is supported
@@ -44,11 +32,13 @@ void ImageLoader::load_image_from_file(const std::string& path, Image& image)
         FreeImage_Unload(orig_bitmap);
     } 
 
+    Image image;
+
     image.width = FreeImage_GetWidth(bitmap);
     image.height = FreeImage_GetHeight(bitmap);
     GLubyte* pixels = FreeImage_GetBits(bitmap);
 
-    image.texture = graphics_->create_texture();
+    image.texture = gc->create_texture();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, image.texture);
     
@@ -64,6 +54,7 @@ void ImageLoader::load_image_from_file(const std::string& path, Image& image)
     FreeImage_Unload(bitmap);
     
     // TODO(eugene): Allow for different filters and wraps
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -71,6 +62,9 @@ void ImageLoader::load_image_from_file(const std::string& path, Image& image)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glBindTexture(GL_TEXTURE_2D, 0u);
+
+    return image;
 }
+
 
 }

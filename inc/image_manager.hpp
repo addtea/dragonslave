@@ -2,47 +2,30 @@
 
 #include <list>
 #include <string>
-#include <unordered_map>
-
-#include <GL/glew.h>
-
+#include "geometry.hpp"
 #include "image.hpp"
 #include "image_loader.hpp"
 
 namespace dragonslave {
 
 
-class ImageManager 
+class ImageManager
 {
 public:
     ImageManager();
-    ~ImageManager();
+    virtual ~ImageManager();
 
-    void set_loader(ImageLoader* loader);
+    void initialize(GraphicsContext* gc, ImageLoader* image_loader);
+    void terminate();
 
-    Image& create_image();
-    Image& create_named_image(const std::string& name);
-
-    Image& load_image(const std::string& path);
-    Image& load_named_image(const std::string& name, const std::string& path);
-
-    Image* get_image(const std::string& name);
+    Image* load_image(const std::string& path);
+    void destroy_image(Image* image);
 
 private:
-    ImageLoader* loader_ = nullptr;
-    std::unordered_map<
-            std::string, 
-            std::list<Image>::iterator>
-        path_cache_;
-    std::unordered_map<
-            std::string, 
-            std::list<Image>::iterator>
-        image_lookup_;
+    GraphicsContext* gc_ = nullptr;
+    ImageLoader* image_loader_ = nullptr;
     std::list<Image> images_;
-
-    void validate_name_(const std::string& name);
-    std::list<Image>::iterator create_image_it_();
 };
 
-
+    
 }

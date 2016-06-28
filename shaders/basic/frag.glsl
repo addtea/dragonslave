@@ -29,5 +29,5 @@ void main()
     if (material.has_diffuse_map) {
         frag_out = texture(material.diffuse_map, fs_in.tex_coord);
     }
-    frag_out = frag_out * clamp(dot(fs_in.normal, vec3(0, 0, 1)), 0, 1);
+    frag_out = vec4(0.5 * fs_in.normal + 0.5, 1);
 }

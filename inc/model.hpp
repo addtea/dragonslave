@@ -1,28 +1,29 @@
 #pragma once
+
 #include <vector>
-#include "geometry.hpp"
-#include "material.hpp"
+#include <glm/glm.hpp>
+#include "mesh.hpp"
+#include "shader.hpp"
+#include "sphere_bound.hpp"
 
 namespace dragonslave {
 
 
-struct Mesh
-{
-    Geometry* geometry;
-    Material* material;
-
-    Mesh(Geometry* geometry, Material* material)
-      : geometry (geometry)
-      , material (material)
-    { }
-};
-
 class Model {
 public:
-    std::vector<Mesh> meshes;
+    SphereBound bound;
 
     Model();
     virtual ~Model();
+    
+    std::vector<Mesh>& get_meshes() { return meshes_; }
+
+    void add_mesh(Geometry* geometry, Material* material, Shader* shader);
+    void update_bound();
+    void reset();
+
+private:
+    std::vector<Mesh> meshes_;
 };
 
 
