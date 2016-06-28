@@ -30,6 +30,8 @@ void App::run()
         input.flush_events();
 
         scene.update();
+        flight.camera->position += flight.camera->get_forward() * flight.forward_speed * 0.1f;
+        flight.camera->position += flight.camera->get_right() * flight.lateral_speed * 0.1f;
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         scene_renderer.render();
@@ -97,6 +99,10 @@ void App::setup_scene_()
     
     scene_renderer.set_scene(&scene);
     scene_renderer.set_active_camera(camera);
+
+    flight.camera = camera;
+
+    window.set_cursor_mode(WindowCursorMode::LOCKED);
 }
 
 
@@ -126,6 +132,45 @@ void App::handle(const KeyboardInputEvent& event)
         LOG(INFO) << "quit";
         is_running_ = false;
     }
+    if (event.key == GLFW_KEY_W) {
+        if (event.action == GLFW_PRESS)
+            flight.forward_speed += 1.f;
+        if (event.action == GLFW_RELEASE)
+            flight.forward_speed -= 1.f;
+    }
+    if (event.key == GLFW_KEY_D) {
+        if (event.action == GLFW_PRESS)
+            flight.lateral_speed += 1.f;
+        if (event.action == GLFW_RELEASE)
+            flight.lateral_speed -= 1.f;
+    }
+    if (event.key == GLFW_KEY_S) {
+        if (event.action == GLFW_PRESS)
+            flight.forward_speed -= 1.f;
+        if (event.action == GLFW_RELEASE)
+            flight.forward_speed += 1.f;
+    }
+    if (event.key == GLFW_KEY_A) {
+        if (event.action == GLFW_PRESS)
+            flight.lateral_speed -= 1.f;
+        if (event.action == GLFW_RELEASE)
+            flight.lateral_speed += 1.f;
+    }
+}
+
+
+void App::handle(const MouseMotionInputEvent& event) 
+{
+    float angle_x = 0.01f * event.dx;
+    float angle_y = 0.01f * event.dy;
+    glm::vec4 forward = glm::vec4(flight.camera->get_forward(), 0);
+    forward = 
+        glm::rotate(glm::mat4{1.f}, angle_x, glm::vec3{0.f, 1.f, 0.f}) * 
+        glm::rotate(glm::mat4{1.f}, angle_y, flight.camera->get_right()) * 
+        forward;
+    flight.camera->look_at(
+        flight.camera->position + glm::vec3(forward),
+        glm::vec3{0.f, 1.f, 0.f});
 }
 
 

@@ -57,6 +57,14 @@ public:
 };
 
 
+enum class WindowCursorMode
+{
+    LOCKED,
+    HIDDEN,
+    NORMAL
+};
+
+
 class Window
 {
 public:
@@ -73,6 +81,7 @@ public:
     int get_height() const { return height_; }
     bool should_close() const;
 
+    void set_cursor_mode(WindowCursorMode mode);
     void add_resize_handler(WindowResizeHandler* handler);
     void remove_resize_handler(WindowResizeHandler* handler);
     void make_current();

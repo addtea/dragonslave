@@ -56,15 +56,19 @@ bool Window::should_close() const
 }
 
 
-void Window::make_current()
+void Window::set_cursor_mode(WindowCursorMode mode)
 {
-   glfwMakeContextCurrent(glfw_window_); 
-}
-
-
-void Window::swap_buffers()
-{
-    glfwSwapBuffers(glfw_window_);
+    switch (mode) {
+    case WindowCursorMode::LOCKED:
+        glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        break;
+    case WindowCursorMode::HIDDEN:
+        glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        break;
+    case WindowCursorMode::NORMAL:
+        glfwSetInputMode(glfw_window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        break;
+    }
 }
 
 
@@ -77,6 +81,18 @@ void Window::add_resize_handler(WindowResizeHandler* handler)
 void Window::remove_resize_handler(WindowResizeHandler* handler)
 {
     resize_channel_.remove(handler);
+}
+
+
+void Window::make_current()
+{
+   glfwMakeContextCurrent(glfw_window_); 
+}
+
+
+void Window::swap_buffers()
+{
+    glfwSwapBuffers(glfw_window_);
 }
 
 

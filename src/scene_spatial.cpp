@@ -21,4 +21,16 @@ void SceneSpatial::create(Scene* scene)
 void SceneSpatial::destroy() { }
 
 
+void SceneSpatial::move(const glm::vec3& offset)
+{
+    position += offset;
+}
+
+
+void SceneSpatial::rotate(float angle, const glm::vec3& axis)
+{
+    orientation = glm::rotate(orientation, angle, axis);
+}
+
+
 }

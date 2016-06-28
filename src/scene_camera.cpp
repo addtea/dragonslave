@@ -15,6 +15,9 @@ void SceneCamera::create(Scene* scene)
     SceneSpatial::create(scene);
     view_matrix = glm::mat4{1.f};
     projection_matrix = glm::mat4{1.f};
+    forward_ = {0.f, 0.f, -1.f};
+    up_ = {0.f, 1.f, 0.f};
+    right_ = {1.f, 0.f, 0.f};
 }
 
 
@@ -23,9 +26,11 @@ void SceneCamera::destroy() { }
 
 void SceneCamera::update_view()
 {
-    glm::mat4 world_matrix = 
-        glm::translate(glm::mat4{1.f}, position) *
-        glm::mat4_cast(orientation);
+    glm::mat4 basis = glm::mat4_cast(orientation);
+    glm::mat4 world_matrix = glm::translate(glm::mat4{1.f}, position) * basis;
+    forward_ = -glm::vec3(basis[2]);
+    up_ = glm::vec3(basis[1]);
+    right_ = glm::vec3(basis[0]);
     view_matrix = glm::inverse(world_matrix);
 }
 
