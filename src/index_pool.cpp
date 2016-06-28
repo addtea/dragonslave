@@ -19,12 +19,13 @@ void IndexPool::create(int capacity)
     max_depth_ = ceil(log(capacity_) / log(32));
     int tree_size_ = (pow(32, max_depth_) - 1) / 31 + (capacity / 32);
     lookup_.resize(tree_size_);
+    clear();
 }
 
 
 void IndexPool::destroy() 
 {
-    clear();
+    lookup_.clear();
 }
 
 
