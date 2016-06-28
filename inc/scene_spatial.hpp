@@ -23,7 +23,7 @@ public:
     virtual void create(Scene* scene);
     virtual void destroy();
 
-    void move(const glm::vec3& offset);
+    void translate(const glm::vec3& offset);
     void rotate(float angle, const glm::vec3& axis);
 };
 

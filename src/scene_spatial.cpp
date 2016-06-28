@@ -21,7 +21,7 @@ void SceneSpatial::create(Scene* scene)
 void SceneSpatial::destroy() { }
 
 
-void SceneSpatial::move(const glm::vec3& offset)
+void SceneSpatial::translate(const glm::vec3& offset)
 {
     position += offset;
 }

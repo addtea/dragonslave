@@ -30,8 +30,8 @@ void App::run()
         input.flush_events();
 
         scene.update();
-        flight.camera->position += flight.camera->get_forward() * flight.forward_speed * 0.1f;
-        flight.camera->position += flight.camera->get_right() * flight.lateral_speed * 0.1f;
+        flight.camera->translate(flight.camera->get_forward() * flight.forward_speed * 0.2f);
+        flight.camera->translate(flight.camera->get_right() * flight.lateral_speed * 0.2f);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         scene_renderer.render();
@@ -161,12 +161,12 @@ void App::handle(const KeyboardInputEvent& event)
 
 void App::handle(const MouseMotionInputEvent& event) 
 {
-    float angle_x = 0.01f * event.dx;
-    float angle_y = 0.01f * event.dy;
+    float angle_x = 0.002f * event.dx;
+    float angle_y = 0.002f * event.dy;
     glm::vec4 forward = glm::vec4(flight.camera->get_forward(), 0);
     forward = 
-        glm::rotate(glm::mat4{1.f}, angle_x, glm::vec3{0.f, 1.f, 0.f}) * 
-        glm::rotate(glm::mat4{1.f}, angle_y, flight.camera->get_right()) * 
+        glm::rotate(glm::mat4{1.f}, -angle_x, glm::vec3{0.f, 1.f, 0.f}) * 
+        glm::rotate(glm::mat4{1.f}, -angle_y, flight.camera->get_right()) * 
         forward;
     flight.camera->look_at(
         flight.camera->position + glm::vec3(forward),
