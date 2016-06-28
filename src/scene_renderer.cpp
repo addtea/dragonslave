@@ -49,7 +49,7 @@ void SceneRenderer::render()
     // TODO(eugene): Add state sorting and state-aware rendering
     for (SceneEntity* entity : visitor.get_visible_entities()) {
         for (Mesh& mesh : entity->model->get_meshes()) {
-            mesh.shader->use();
+            mesh.shader->activate();
             mesh.shader->set_view_projection(
                 active_camera_->view_matrix,
                 active_camera_->projection_matrix);

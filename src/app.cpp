@@ -86,17 +86,14 @@ void App::setup_scene_()
     
     SceneEntity* entity = scene.create_entity();
     entity->model = model;
-
     scene.get_root()->add_child(entity);
 
     SceneCamera* camera = scene.create_camera();
     float aspect = 800.f / 600.f;
     camera->projection_matrix = glm::perspective(1.f, aspect, 0.1f, 1000.f);
-    scene.get_root()->add_child(camera);
     camera->position = glm::vec3{0.f, 10.f, 20.f};
-    scene.update();
-
     camera->look_at({0.f, 0.f, 0.f}, {0.f, 1.f, 0.f});
+    camera->update_view();
     
     scene_renderer.set_scene(&scene);
     scene_renderer.set_active_camera(camera);

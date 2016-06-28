@@ -11,10 +11,7 @@ public:
     BasicShader();
     virtual ~BasicShader();
 
-    void setup(GraphicsContext* gc) override;
-    void cleanup(GraphicsContext* gc) override;
-
-    void use() override;
+    void activate() override;
     void set_view_projection(
         const glm::mat4& view,
         const glm::mat4& projection) override;
@@ -24,6 +21,10 @@ public:
     void draw_instances(
         std::vector<glm::mat4> model_matrices,
         Geometry* geometry) override;
+
+protected:
+    void on_setup(GraphicsContext* gc) override;
+    void on_cleanup(GraphicsContext* gc) override;
 
 private:
     glm::mat4 view_matrix_;

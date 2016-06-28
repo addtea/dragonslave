@@ -134,13 +134,6 @@ void SceneUpdateVisitor::visit(SceneEntity* entity)
 }
 
 
-void SceneUpdateVisitor::visit(SceneCamera* camera)
-{
-    if (!camera->is_world_updated())
-        camera->update_world();
-}
-
-
 void SceneUpdateVisitor::visit(SceneGroup* group)
 {
     if (!group->is_world_updated())

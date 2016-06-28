@@ -11,7 +11,7 @@ SceneLight::~SceneLight() { }
 
 void SceneLight::create(Scene* scene)
 {
-    SceneSpatial::create(scene);
+    SceneNode::create(scene);
     type = SceneLightType::POINT;
     ambient  = {0.0f, 0.0f, 0.0f};
     diffuse  = {1.0f, 1.0f, 1.0f};

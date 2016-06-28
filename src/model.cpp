@@ -9,6 +9,15 @@ Model::Model() { }
 Model::~Model() { }
 
 
+void Model::create()
+{
+    reset();
+}
+
+
+void Model::destroy() { }
+
+
 void Model::add_mesh(Geometry* geometry, Material* material, Shader* shader)
 {
     meshes_.push_back({geometry, material, shader});

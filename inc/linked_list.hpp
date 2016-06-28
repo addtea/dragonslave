@@ -10,7 +10,7 @@ class LinkedList;
 template <typename TData>
 struct LinkedListNode
 {
-    TData* data;
+    TData* data = nullptr;
     LinkedListNode* next = nullptr;
     LinkedListNode* prev = nullptr;
 

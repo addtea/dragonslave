@@ -36,7 +36,9 @@ void ModelManager::terminate()
 Model* ModelManager::create_model()
 {
     models_.emplace_back();
-    return &models_.back();
+    Model* model = &models_.back();
+    model->create();
+    return model;
 }
 
 
@@ -56,6 +58,7 @@ Model* ModelManager::load_model(const std::string& path)
 
 void ModelManager::destroy_model(Model* model)
 {
+    model->destroy();
     std::remove_if(
         models_.begin(),
         models_.end(),

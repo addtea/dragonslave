@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene_spatial.hpp"
+#include "scene_node.hpp"
 
 namespace dragonslave {
 
@@ -13,7 +13,7 @@ enum class SceneLightType
 };
 
 
-class SceneLight : public SceneSpatial
+class SceneLight : public SceneNode
 {
 public:
     SceneLightType type;

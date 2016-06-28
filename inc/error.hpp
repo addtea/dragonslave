@@ -10,9 +10,9 @@ class FatalError : public std::runtime_error
 {
 public:
     FatalError(const std::string& type, const std::string& message)
-      : std::runtime_error(build_what_(type, message))
-      , type_ (type)
-      , message_ (message)
+      : std::runtime_error{build_what_(type, message)}
+      , type_ {type}
+      , message_ {message}
     { }
 
     virtual ~FatalError() { }

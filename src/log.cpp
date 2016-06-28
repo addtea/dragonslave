@@ -11,20 +11,20 @@ Logger::Logger(
 { 
     switch (level) {
         case LogLevel::DEBUG:
-            buffer_ << "\033[0;34m" << "DD";
+            buffer_ << "\033[0;34m" << "DEBUG";
             break;
         case LogLevel::INFO:
-            buffer_ << "\033[0;32m" << "II";
+            buffer_ << "\033[0;32m" << "INFO";
             break;
         case LogLevel::WARNING:
-            buffer_ << "\033[0;33m" << "WW";
+            buffer_ << "\033[0;33m" << "WARNING";
             break;
         case LogLevel::ERROR:
-            buffer_ << "\033[0;31m" << "XX";
+            buffer_ << "\033[0;31m" << "ERROR";
     }
-    buffer_ << "\033[0;0m" 
-            << std::right << std::setw(20) << file << ":"
-            << std::left  << std::setw(5)  << line << "] ";
+    buffer_ << "\033[0;0m " 
+            << file << ":"
+            << line << " -- ";
 }
 
 Logger::~Logger()

@@ -6,13 +6,13 @@ namespace dragonslave {
 void Shader::create(GraphicsContext* gc) 
 {
     gc_ = gc;
-    setup(gc_);
+    on_setup(gc_);
 }
 
 
 void Shader::destroy()
 {
-    cleanup(gc_);
+    on_cleanup(gc_);
     gc_ = nullptr;
 }
 

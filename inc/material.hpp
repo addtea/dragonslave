@@ -15,7 +15,7 @@ struct Material
     glm::vec3 ambient_color {0.f, 0.f, 0.f};
     glm::vec3 diffuse_color {1.f, 1.f, 1.f};
     glm::vec3 specular_color {0.f, 0.f, 0.f};
-    float shininess;
+    float shininess = 10.f;
 
     GLuint ambient_map = 0u;
     GLuint diffuse_map = 0u;

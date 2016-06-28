@@ -16,14 +16,14 @@ public:
 
     int get_capacity() const { return capacity_; }
 
-    void clear();
     int request_index();
     void free_index(int index);
+    void clear();
 
 private:
     int capacity_ = 0;
+    int max_depth_ = 0;
     std::vector<uint32_t> lookup_;
-    int max_depth_;
 };
 
 

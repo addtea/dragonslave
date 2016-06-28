@@ -1,12 +1,12 @@
 #pragma once
 
 #include "model.hpp"
-#include "scene_spatial.hpp"
+#include "scene_node.hpp"
 
 namespace dragonslave {
 
 
-class SceneEntity : public SceneSpatial
+class SceneEntity : public SceneNode
 {
 public:
     glm::vec3 scale;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include "scene_spatial.hpp"
 #include "frustrum.hpp"
 
@@ -17,8 +19,8 @@ public:
     virtual ~SceneCamera();
 
     virtual void create(Scene* scene) override;
+    virtual void destroy() override;
 
-    virtual void accept(SceneVisitor* visitor) override;
     void update_view();
     void update_frustrum();
     void look_at(const glm::vec3& target, const glm::vec3& up);

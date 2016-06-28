@@ -6,7 +6,7 @@ BUILD_DIR	:= .build
 DOC_DIR		:= doc
 
 CC			:= clang++
-CFLAGS		:= -std=c++14 -O0 -g
+CFLAGS		:= -std=c++14 -O2
 INCS		:= -I$(INC_DIR)
 LIBS		:= -lGL -lGLEW -lglfw -lassimp -lfreeimage
 SOURCES		:= $(shell find $(SRC_DIR) -name '*.cpp' -type 'f' | sort)

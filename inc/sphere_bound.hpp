@@ -11,7 +11,7 @@ struct SphereBound
     bool is_infinite = true;
 
     glm::vec3 center;
-    float radius;
+    float radius = 0.f;
 };
 
 

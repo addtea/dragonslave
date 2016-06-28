@@ -22,7 +22,6 @@ public:
     GLuint create_vertex_array();
     GLuint load_program(const std::vector<GLuint>& shaders);
     GLuint load_shader(GLenum type, const std::string& path);
-
     void destroy_buffer(GLuint buffer);
     void destroy_program(GLuint program);
     void destroy_shader(GLuint shader);

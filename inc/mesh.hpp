@@ -9,9 +9,9 @@ namespace dragonslave {
 
 struct Mesh 
 {
-    Geometry* geometry;
-    Material* material;
-    Shader* shader;
+    Geometry* geometry = nullptr;
+    Material* material = nullptr;
+    Shader* shader = nullptr;
 };
 
 

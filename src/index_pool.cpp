@@ -19,15 +19,11 @@ void IndexPool::create(int capacity)
     max_depth_ = ceil(log(capacity_) / log(32));
     int tree_size_ = (pow(32, max_depth_) - 1) / 31 + (capacity / 32);
     lookup_.resize(tree_size_);
-
     clear();
 }
 
 
-void IndexPool::destroy()
-{
-    capacity_ = 0;
-}
+void IndexPool::destroy() { }
 
 
 int IndexPool::request_index()
@@ -39,7 +35,7 @@ int IndexPool::request_index()
     int cursor = 0;
 
     while (depth < max_depth_) {
-        int offset = index_of_first_set_bit(lookup_[base + cursor]);
+        int offset = bit_utils::index_of_first_set_bit(lookup_[base + cursor]);
         if (offset < 0) {
             return -1;
         }
@@ -61,7 +57,7 @@ int IndexPool::request_index()
         int offset = cursor % 32;
         cursor /= 32;
         lookup_[base + cursor] &= ~(1 << offset);
-    } while (depth >= 0 && index_of_first_set_bit(lookup_[base + cursor]) < 0);
+    } while (depth >= 0 && bit_utils::index_of_first_set_bit(lookup_[base + cursor]) < 0);
 
     return index;
 }

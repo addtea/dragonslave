@@ -23,15 +23,14 @@ public:
     SceneEntity* create_entity();
     SceneGroup* create_group();
     SceneLight* create_light();
-
     void destroy_camera(SceneCamera* camera);
     void destroy_entity(SceneEntity* entity);
     void destroy_group(SceneGroup* group);
     void destroy_light(SceneLight* light);
 
-    void clear();
-    void traverse(SceneVisitor* visitor);
     void update();
+    void traverse(SceneVisitor* visitor);
+    void clear();
 
 private:
     constexpr static int CAMERA_POOL_SIZE = 100;
@@ -47,8 +46,7 @@ private:
     std::array<SceneGroup, GROUP_POOL_SIZE> group_pool_;
     IndexPool light_indices_;
     std::array<SceneLight, LIGHT_POOL_SIZE> light_pool_;
-
-    SceneGroup* root_;
+    SceneGroup* root_ = nullptr;
 };
 
 
@@ -58,7 +56,6 @@ public:
     SceneUpdateVisitor();
     virtual ~SceneUpdateVisitor();
 
-    virtual void visit(SceneCamera* camera) override;
     virtual void visit(SceneEntity* entity) override;
     virtual void visit(SceneGroup* group) override;
     virtual void visit(SceneLight* light) override;

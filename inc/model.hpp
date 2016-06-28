@@ -18,6 +18,9 @@ public:
     
     std::vector<Mesh>& get_meshes() { return meshes_; }
 
+    void create();
+    void destroy();
+
     void add_mesh(Geometry* geometry, Material* material, Shader* shader);
     void update_bound();
     void reset();
