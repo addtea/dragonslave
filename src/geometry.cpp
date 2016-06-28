@@ -12,6 +12,12 @@ Geometry::~Geometry() { }
 void Geometry::create(GraphicsContext* gc)
 {
     gc_ = gc;
+    vao_ = 0u;
+    vbo_positions_ = 0u;
+    vbo_normals_ = 0u;
+    vbo_tex_coords_ = 0u;
+    ebo_ = 0u;
+    type = GL_TRIANGLES;
 }
 
 
@@ -23,12 +29,10 @@ void Geometry::destroy()
     if (vbo_tex_coords_) gc_->destroy_buffer(vbo_tex_coords_);
     if (ebo_) gc_->destroy_buffer(ebo_);
 
-    gc_ = nullptr;
-    vao_ = 0u;
-    vbo_positions_ = 0u;
-    vbo_normals_ = 0u;
-    vbo_tex_coords_ = 0u;
-    ebo_ = 0u;
+    positions.clear();
+    normals.clear();
+    tex_coords.clear();
+    indices.clear();
 }
 
 

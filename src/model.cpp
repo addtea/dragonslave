@@ -9,13 +9,19 @@ Model::Model() { }
 Model::~Model() { }
 
 
-void Model::create()
-{
-    reset();
+void Model::create() 
+{ 
+    bound.is_null = true;
+    bound.is_infinite = false;
+    bound.center = glm::vec3{0.f, 0.f, 0.f};
+    bound.radius = 0.f;
 }
 
 
-void Model::destroy() { }
+void Model::destroy() 
+{ 
+    reset();
+}
 
 
 void Model::add_mesh(Geometry* geometry, Material* material, Shader* shader)
