@@ -177,6 +177,7 @@ void App::handle(const MouseMotionInputEvent& event)
     float offset_scale = gs.camera->position.y / glm::dot(glm::vec3{0.f, -1.f, 0.f}, gs.camera->get_forward());
     // Calculate where vision is pointing at
     gs.camera->translate({event.dx * camera_speed, 0.f, event.dy * camera_speed});
+    gs.camera->update_view();
     glm::vec3 ground_pos = 
         gs.camera->position +
         offset_scale * gs.camera->get_forward();
@@ -188,7 +189,7 @@ void App::handle(const MouseMotionInputEvent& event)
 
 void App::handle(const MouseButtonInputEvent& event) 
 {
-    if (event.button == 0 && event.action == GLFW_PRESS) {
+    if (event.button == 0 && event.action == GLFW_RELEASE) {
         SceneEntity* obstacle = scene.create_entity();
         obstacle->model = gs.obstacle_model;
         obstacle->position = gs.cursor->position;

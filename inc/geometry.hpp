@@ -26,7 +26,9 @@ public:
 
     void create(GraphicsContext* gc);
     void destroy();
+
     void upload();
+    void bind();
     void stream();
     void stream_instances(int num_instances);
 

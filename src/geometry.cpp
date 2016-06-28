@@ -82,18 +82,21 @@ void Geometry::upload()
 }
 
 
-void Geometry::stream() 
+void Geometry::bind()
 {
     glBindVertexArray(vao_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+}
+
+
+void Geometry::stream() 
+{
     glDrawElements(type, count_, GL_UNSIGNED_INT, 0);
 }
 
 
 void Geometry::stream_instances(int num_instances)
 {
-    glBindVertexArray(vao_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
     glDrawElementsInstanced(type, count_, GL_UNSIGNED_INT, 0, num_instances);
 }
 

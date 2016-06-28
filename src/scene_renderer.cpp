@@ -41,8 +41,6 @@ void SceneRenderer::set_viewport(int width, int height)
 
 void SceneRenderer::render()
 {
-    active_camera_->update_view();
-
     SceneCullVisitor visitor (active_camera_);
     scene_->traverse(&visitor);
 
@@ -54,6 +52,7 @@ void SceneRenderer::render()
                 active_camera_->view_matrix,
                 active_camera_->projection_matrix);
             mesh.shader->set_material(mesh.material);
+            mesh.geometry->bind();
             mesh.shader->draw(
                 entity->model_matrix,
                 mesh.geometry);
