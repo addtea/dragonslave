@@ -26,6 +26,7 @@ public:
     const glm::vec3& get_right() { return right_; }
 
     void update_view();
+    void update_directions();
     void update_frustrum();
     void look_at(const glm::vec3& target, const glm::vec3& up);
 

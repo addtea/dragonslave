@@ -18,16 +18,6 @@
 namespace dragonslave {
 
 
-// Temporary POD for exploring scene
-struct FlightState
-{
-    SceneCamera* camera = nullptr;
-    float forward_speed = 0.f;
-    float lateral_speed = 0.f;
-};
-
-
-
 class App : public InputEventHandler
 {
 public:
@@ -47,14 +37,14 @@ public:
     Scene scene;
     SceneRenderer scene_renderer;
 
-    FlightState flight;
-
     App();
     virtual ~App();
 
     void run();
     void handle(const KeyboardInputEvent& event) override;
     void handle(const MouseMotionInputEvent& event) override;
+    void handle(const MouseButtonInputEvent& event) override;
+    void handle(const MouseScrollInputEvent& event) override;
 
 private:
     bool is_running_ = false;

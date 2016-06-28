@@ -26,8 +26,9 @@ public:
 
     void create(GraphicsContext* gc);
     void destroy();
-    void stream();
     void upload();
+    void stream();
+    void stream_instances(int num_instances);
 
 private:
     GraphicsContext* gc_ = nullptr;

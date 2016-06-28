@@ -17,6 +17,7 @@ void SceneNode::create(Scene* scene)
 {
     SceneSpatial::create(scene);
     parent = nullptr;
+    is_visible = true;
     world_matrix = glm::mat4{1.f};
     world_updated_ = false;
 }

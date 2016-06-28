@@ -12,11 +12,12 @@ Geometry::~Geometry() { }
 void Geometry::create(GraphicsContext* gc)
 {
     gc_ = gc;
-    vao_ = 0u;
-    vbo_positions_ = 0u;
-    vbo_normals_ = 0u;
-    vbo_tex_coords_ = 0u;
-    ebo_ = 0u;
+    vao_ = gc_->create_vertex_array();
+    vbo_positions_ = gc_->create_buffer();
+    vbo_normals_ = gc_->create_buffer();
+    vbo_tex_coords_ = gc_->create_buffer();
+    ebo_ = gc_->create_buffer();
+
     type = GL_TRIANGLES;
 }
 
@@ -38,12 +39,6 @@ void Geometry::destroy()
 
 void Geometry::upload()
 {
-    vao_ = gc_->create_vertex_array();
-    vbo_positions_ = gc_->create_buffer();
-    vbo_normals_ = gc_->create_buffer();
-    vbo_tex_coords_ = gc_->create_buffer();
-    ebo_ = gc_->create_buffer();
-
     glBindVertexArray(vao_);
 
     // Positions
@@ -92,6 +87,14 @@ void Geometry::stream()
     glBindVertexArray(vao_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
     glDrawElements(type, count_, GL_UNSIGNED_INT, 0);
+}
+
+
+void Geometry::stream_instances(int num_instances)
+{
+    glBindVertexArray(vao_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+    glDrawElementsInstanced(type, count_, GL_UNSIGNED_INT, 0, num_instances);
 }
 
 

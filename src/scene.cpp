@@ -159,13 +159,15 @@ SceneCullVisitor::~SceneCullVisitor() { }
 
 void SceneCullVisitor::visit(SceneEntity* entity)
 {
-    visible_entities_.push_back(entity);
+    if (entity->is_visible)
+        visible_entities_.push_back(entity);
 }
 
 
 void SceneCullVisitor::visit(SceneGroup* group)
 {
-    group->traverse_children(this);
+    if (group->is_visible)
+        group->traverse_children(this);
 }
 
 

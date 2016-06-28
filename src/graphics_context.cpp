@@ -43,7 +43,7 @@ GLuint GraphicsContext::load_shader(GLenum type, const std::string& path)
 {
     std::ifstream in (path);
     if (!in.is_open()) {
-        LOG(DEBUG) << "Could not open file, \"" << path << "\"";
+        LOG(ERROR) << "Could not open file, \"" << path << "\"";
         throw FatalError("FileNotFoundError", "Failed to open file");
     }
     GLuint shader = glCreateShader(type);
@@ -67,7 +67,7 @@ GLuint GraphicsContext::load_shader(GLenum type, const std::string& path)
         std::vector<GLchar> log_buffer (log_length);
         glGetShaderInfoLog(shader, log_length, &log_length, log_buffer.data());
         std::string log (log_buffer.data(), static_cast<size_t>(log_length - 1));
-        LOG(DEBUG) << "Dumping log:\n" << log;
+        LOG(ERROR) << "Dumping log:\n" << log;
         throw FatalError("ShaderCompileError", "Failed to compile shader");
     }
 
@@ -94,7 +94,7 @@ GLuint GraphicsContext::load_program(const std::vector<GLuint>& shaders)
         std::vector<GLchar> log_buffer (log_length);
         glGetProgramInfoLog(program, log_length, &log_length, log_buffer.data());
         std::string log (log_buffer.data(), static_cast<size_t>(log_length - 1));
-        LOG(DEBUG) << "Dumping log:\n" << log;
+        LOG(ERROR) << "Dumping log:\n" << log;
         throw FatalError("ProgramLinkError", "Failed to link program");
     }
 

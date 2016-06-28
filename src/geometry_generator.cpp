@@ -12,9 +12,38 @@ GeometryGenerator::GeometryGenerator() { }
 GeometryGenerator::~GeometryGenerator() { }
 
 
-void GeometryGenerator::generate_cube(float radius, Geometry* geometry)
+void GeometryGenerator::generate_plane(float scale, Geometry* geometry)
 {
-    float scale = radius / glm::sqrt(3);
+    glm::vec3 v0 {-scale, 0.f,-scale};
+    glm::vec3 v1 { scale, 0.f,-scale};
+    glm::vec3 v2 {-scale, 0.f, scale};
+    glm::vec3 v3 { scale, 0.f, scale};
+
+    geometry->has_normals = true;
+    geometry->has_tex_coords = false;
+    geometry->positions.clear();
+    geometry->normals.clear();
+
+    geometry->positions.push_back(v0);
+    geometry->normals.push_back({0.f, 1.f, 0.f});
+    geometry->positions.push_back(v1);
+    geometry->normals.push_back({0.f, 1.f, 0.f});
+    geometry->positions.push_back(v2);
+    geometry->normals.push_back({0.f, 1.f, 0.f});
+    geometry->positions.push_back(v3);
+    geometry->normals.push_back({0.f, 1.f, 0.f});
+
+    geometry->indices.push_back(0);
+    geometry->indices.push_back(1);
+    geometry->indices.push_back(2);
+    geometry->indices.push_back(3);
+
+    geometry->type = GL_TRIANGLE_STRIP;
+}
+
+
+void GeometryGenerator::generate_cube(float scale, Geometry* geometry)
+{
     glm::vec3 v0 {-scale, scale, scale};
     glm::vec3 v1 { scale, scale, scale};
     glm::vec3 v2 { scale, scale,-scale};
@@ -170,6 +199,7 @@ void GeometryGenerator::generate_sphere(float radius, int subdivides, Geometry* 
 void GeometryGenerator::generate_cylinder(float height, float radius, int subdivides, Geometry* geometry)
 {
     int hslices = subdivides;
+    float half_height = height / 2.f;
 
     geometry->has_normals = true;
     geometry->has_tex_coords = false;
@@ -177,39 +207,39 @@ void GeometryGenerator::generate_cylinder(float height, float radius, int subdiv
     geometry->normals.clear();
 
     for (int j = 0; j < hslices; j++) {
-        geometry->positions.push_back({0.f, height, 0.f});
+        geometry->positions.push_back({0.f, half_height, 0.f});
         geometry->normals.push_back({0.f, 1.f, 0.f});
     }
     for (int j = 0; j < hslices; j++) {
         float a = (2 * glm::pi<float>() * j) / (hslices - 1);
         float x = glm::cos(a);
         float z = glm::sin(a);
-        geometry->positions.push_back(radius * glm::vec3{x, height, z});
+        geometry->positions.push_back(radius * glm::vec3{x, half_height, z});
         geometry->normals.push_back({0.f, 1.f, 0.f});
     }
     for (int j = 0; j < hslices; j++) {
         float a = (2 * glm::pi<float>() * j) / (hslices - 1);
         float x = glm::cos(a);
         float z = glm::sin(a);
-        geometry->positions.push_back(radius * glm::vec3{x, height, z});
+        geometry->positions.push_back(radius * glm::vec3{x, half_height, z});
         geometry->normals.push_back({x, 0.f, z});
     }
     for (int j = 0; j < hslices; j++) {
         float a = (2 * glm::pi<float>() * j) / (hslices - 1);
         float x = glm::cos(a);
         float z = glm::sin(a);
-        geometry->positions.push_back(radius * glm::vec3{x, -height, z});
+        geometry->positions.push_back(radius * glm::vec3{x, -half_height, z});
         geometry->normals.push_back({x, 0.f, z});
     }
     for (int j = 0; j < hslices; j++) {
         float a = (2 * glm::pi<float>() * j) / (hslices - 1);
         float x = glm::cos(a);
         float z = glm::sin(a);
-        geometry->positions.push_back(radius * glm::vec3{x, -height, z});
+        geometry->positions.push_back(radius * glm::vec3{x, -half_height, z});
         geometry->normals.push_back({0.f, -1.f, 0.f});
     }
     for (int j = 0; j < hslices; j++) {
-        geometry->positions.push_back({0.f, -height, 0.f});
+        geometry->positions.push_back({0.f, -half_height, 0.f});
         geometry->normals.push_back({0.f, -1.f, 0.f});
     }
 

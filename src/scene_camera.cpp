@@ -26,12 +26,21 @@ void SceneCamera::destroy() { }
 
 void SceneCamera::update_view()
 {
+    glm::mat4 world_matrix;
+    world_matrix[0] = glm::vec4{right_, 0.f};
+    world_matrix[1] = glm::vec4{up_, 0.f};
+    world_matrix[2] = glm::vec4{-forward_, 0.f};
+    world_matrix[3] = glm::vec4{position, 1.f};
+    view_matrix = glm::inverse(world_matrix);
+}
+
+
+void SceneCamera::update_directions()
+{
     glm::mat4 basis = glm::mat4_cast(orientation);
-    glm::mat4 world_matrix = glm::translate(glm::mat4{1.f}, position) * basis;
     forward_ = -glm::vec3(basis[2]);
     up_ = glm::vec3(basis[1]);
     right_ = glm::vec3(basis[0]);
-    view_matrix = glm::inverse(world_matrix);
 }
 
 
@@ -43,10 +52,10 @@ void SceneCamera::update_frustrum()
 
 void SceneCamera::look_at(const glm::vec3& target, const glm::vec3& up)
 {
-    glm::vec3 local_forward = glm::normalize(target - position);
-    glm::vec3 local_right = glm::normalize(glm::cross(local_forward, up));
-    glm::vec3 local_up = glm::normalize(glm::cross(local_right, local_forward));
-    glm::mat3 local_basis {local_right, local_up, -local_forward};
+    forward_ = glm::normalize(target - position);
+    right_ = glm::normalize(glm::cross(forward_, up));
+    up_ = glm::normalize(glm::cross(right_, forward_));
+    glm::mat3 local_basis {right_, up_, -forward_};
     orientation = glm::quat_cast(local_basis);
 }
 

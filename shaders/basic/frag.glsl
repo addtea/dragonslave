@@ -25,9 +25,37 @@ out vec4 frag_out;
 
 void main()
 {
-    frag_out = vec4(material.diffuse_color, 1);
-    if (material.has_diffuse_map) {
-        frag_out = texture(material.diffuse_map, fs_in.tex_coord);
-    }
-    frag_out = vec4(0.5 * fs_in.normal + 0.5, 1);
+    
+    // This is a hack; needs actual light rendering
+    vec3 light_pos =  vec3(0., 0., 0.);
+
+    vec3 normal = normalize(fs_in.normal);
+
+    vec3 to_eye = vec3(0., 0., 1.);
+    vec3 to_light = normalize(light_pos - fs_in.position);
+
+    float ambient_factor = 1;
+
+    // Added some tooniness
+    float diffuse_factor = 0.4 + (0.6 * clamp(dot(normal, to_light), 0, 1));
+
+    vec3 to_reflect = -to_light + 2 * diffuse_factor * normal;
+
+    float specular_factor = pow(clamp(dot(to_reflect, to_eye), 0, 1), material.shininess);
+
+    vec3 ambient = material.ambient_color;
+    if (material.has_ambient_map)
+        ambient = texture(material.ambient_map, fs_in.tex_coord).xyz;
+    vec3 diffuse = material.diffuse_color;
+    if (material.has_diffuse_map)
+        diffuse = texture(material.diffuse_map, fs_in.tex_coord).xyz;
+    vec3 specular = material.specular_color;
+    if (material.has_specular_map)
+        ambient = texture(material.specular_map, fs_in.tex_coord).xyz;
+
+    frag_out = vec4(
+        ambient * ambient_factor + 
+        diffuse * diffuse_factor + 
+        specular * specular_factor,
+        1.);
 }

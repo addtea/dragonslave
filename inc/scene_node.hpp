@@ -13,6 +13,7 @@ class SceneGroup;
 class SceneNode : public SceneSpatial
 {
 public:
+    bool is_visible = true;
     SceneGroup* parent;
     glm::mat4 world_matrix;
     LinkedListNode<SceneNode> sibling_node;

@@ -9,6 +9,18 @@
 namespace dragonslave {
 
 
+// Temporary POD for storing game state
+struct GameState
+{
+    SceneCamera* camera = nullptr;
+    SceneEntity* cursor = nullptr;
+    Model* obstacle_model = nullptr;
+};
+
+
+static GameState gs;
+
+
 App::App() { }
 
 
@@ -30,8 +42,6 @@ void App::run()
         input.flush_events();
 
         scene.update();
-        flight.camera->translate(flight.camera->get_forward() * flight.forward_speed * 0.2f);
-        flight.camera->translate(flight.camera->get_right() * flight.lateral_speed * 0.2f);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         scene_renderer.render();
@@ -77,30 +87,57 @@ void App::setup_scene_()
     Shader* shader = shader_manager.create_shader<BasicShader>();
     shader_manager.set_default_shader(shader);
 
-    Geometry* geometry = geometry_manager.create_geometry();
-    geometry_generator.generate_cylinder(1.f, 2.f, 20, geometry);
-    geometry->upload();
-    Material* material = material_manager.create_material();
-    material->has_diffuse_map = false;
-    material->diffuse_color = {1.f, 1.f, 0.f};
-    Model* model = model_manager.create_model();
-    model->add_mesh(geometry, material, shader);
-    
-    SceneEntity* entity = scene.create_entity();
-    entity->model = model;
-    scene.get_root()->add_child(entity);
+    Geometry* plane = geometry_manager.create_geometry();
+    Geometry* cube = geometry_manager.create_geometry();
+    Geometry* cylinder = geometry_manager.create_geometry();
 
-    SceneCamera* camera = scene.create_camera();
+    geometry_generator.generate_plane(1.f, plane);
+    plane->upload();
+
+    geometry_generator.generate_cube(0.5f, cube);
+    cube->upload();
+
+    geometry_generator.generate_cylinder(2.f, 0.5f, 16, cylinder);
+    cylinder->upload();
+
+    Material* ground_mat = material_manager.create_material();
+    Material* selected_mat = material_manager.create_material();
+    Material* obstacle_mat = material_manager.create_material();
+
+    ground_mat->diffuse_color = glm::vec3{0.8f, 0.8f, 0.8f};
+    selected_mat->diffuse_color = glm::vec3{0.0f, 1.f, 0.0f};
+    obstacle_mat->diffuse_color = glm::vec3{1.0f, 1.f, 1.0f};
+
+    Model* ground_model = model_manager.create_model();
+    ground_model->add_mesh(plane, ground_mat, shader);
+
+    Model* cursor_model = model_manager.create_model();
+    cursor_model->add_mesh(cylinder, selected_mat, shader);
+
+    gs.obstacle_model = model_manager.create_model();
+    gs.obstacle_model->add_mesh(cube, obstacle_mat, shader);
+
+    SceneEntity* ground_entity = scene.create_entity();
+    ground_entity->model = ground_model;
+    ground_entity->scale = glm::vec3{64.5f, 0.f, 64.5f};
+
+    gs.cursor = scene.create_entity();
+    gs.cursor->position = glm::vec3{0.f, 0.1f, 0.f};
+    gs.cursor->model = cursor_model;
+    gs.cursor->scale = glm::vec3{0.55f, 0.2f, 0.55f};
+
+    scene.get_root()->add_child(ground_entity);
+    scene.get_root()->add_child(gs.cursor);
+
+    gs.camera = scene.create_camera();
     float aspect = 800.f / 600.f;
-    camera->projection_matrix = glm::perspective(1.f, aspect, 0.1f, 1000.f);
-    camera->position = glm::vec3{0.f, 10.f, 20.f};
-    camera->look_at({0.f, 0.f, 0.f}, {0.f, 1.f, 0.f});
-    camera->update_view();
+    gs.camera->projection_matrix = glm::perspective(1.f, aspect, 0.1f, 1000.f);
+    gs.camera->position = glm::vec3{0.f, 12.f, 4.f};
+    gs.camera->look_at({0.f, 0.f, 0.f}, {0.f, 0.f, -1.f});
+    gs.camera->update_view();
     
     scene_renderer.set_scene(&scene);
-    scene_renderer.set_active_camera(camera);
-
-    flight.camera = camera;
+    scene_renderer.set_active_camera(gs.camera);
 
     window.set_cursor_mode(WindowCursorMode::LOCKED);
 }
@@ -127,50 +164,44 @@ void App::poll_()
 
 void App::handle(const KeyboardInputEvent& event) 
 {
-    LOG(INFO) << "key event " << event.key << " " << event.action;
     if (event.key == GLFW_KEY_ESCAPE && event.action == GLFW_RELEASE) {
         LOG(INFO) << "quit";
         is_running_ = false;
-    }
-    if (event.key == GLFW_KEY_W) {
-        if (event.action == GLFW_PRESS)
-            flight.forward_speed += 1.f;
-        if (event.action == GLFW_RELEASE)
-            flight.forward_speed -= 1.f;
-    }
-    if (event.key == GLFW_KEY_D) {
-        if (event.action == GLFW_PRESS)
-            flight.lateral_speed += 1.f;
-        if (event.action == GLFW_RELEASE)
-            flight.lateral_speed -= 1.f;
-    }
-    if (event.key == GLFW_KEY_S) {
-        if (event.action == GLFW_PRESS)
-            flight.forward_speed -= 1.f;
-        if (event.action == GLFW_RELEASE)
-            flight.forward_speed += 1.f;
-    }
-    if (event.key == GLFW_KEY_A) {
-        if (event.action == GLFW_PRESS)
-            flight.lateral_speed -= 1.f;
-        if (event.action == GLFW_RELEASE)
-            flight.lateral_speed += 1.f;
     }
 }
 
 
 void App::handle(const MouseMotionInputEvent& event) 
 {
-    float angle_x = 0.002f * event.dx;
-    float angle_y = 0.002f * event.dy;
-    glm::vec4 forward = glm::vec4(flight.camera->get_forward(), 0);
-    forward = 
-        glm::rotate(glm::mat4{1.f}, -angle_x, glm::vec3{0.f, 1.f, 0.f}) * 
-        glm::rotate(glm::mat4{1.f}, -angle_y, flight.camera->get_right()) * 
-        forward;
-    flight.camera->look_at(
-        flight.camera->position + glm::vec3(forward),
-        glm::vec3{0.f, 1.f, 0.f});
+    float camera_speed = 0.02f;
+    float offset_scale = gs.camera->position.y / glm::dot(glm::vec3{0.f, -1.f, 0.f}, gs.camera->get_forward());
+    // Calculate where vision is pointing at
+    gs.camera->translate({event.dx * camera_speed, 0.f, event.dy * camera_speed});
+    glm::vec3 ground_pos = 
+        gs.camera->position +
+        offset_scale * gs.camera->get_forward();
+    gs.cursor->position.x = static_cast<int>(ground_pos.x);
+    gs.cursor->position.z = static_cast<int>(ground_pos.z);
+    gs.cursor->need_world_update();
+}
+
+
+void App::handle(const MouseButtonInputEvent& event) 
+{
+    if (event.button == 0 && event.action == GLFW_PRESS) {
+        SceneEntity* obstacle = scene.create_entity();
+        obstacle->model = gs.obstacle_model;
+        obstacle->position = gs.cursor->position;
+        obstacle->position.y = 0.5f;
+        scene.get_root()->add_child(obstacle);
+    }
+}
+
+
+void App::handle(const MouseScrollInputEvent& event)
+{
+    float camera_speed = 0.02f;
+    gs.camera->translate(static_cast<float>(event.scroll_y) * gs.camera->get_forward());
 }
 
 
