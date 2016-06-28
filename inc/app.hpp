@@ -1,66 +1,55 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include "asset_manager.hpp"
 #include "error.hpp"
-#include "graphics.hpp"
-#include "input.hpp"
+#include "graphics_context.hpp"
+#include "geometry_manager.hpp"
+#include "geometry_generator.hpp"
+#include "image_loader.hpp"
+#include "image_manager.hpp"
+#include "input_queue.hpp"
+#include "material_manager.hpp"
+#include "model_loader.hpp"
+#include "model_manager.hpp"
+#include "scene.hpp"
+#include "scene_renderer.hpp"
+#include "shader_manager.hpp"
 #include "window.hpp"
 
 namespace dragonslave {
 
 
-struct AppConfig
-{
-    std::string title = "Window";
-    int width = 800;
-    int height = 600;
-
-    bool shown = true;
-    bool borderless = false;
-    bool fullscreen = false;
-    bool resizable = false;
-
-    bool double_buffered = true;
-};
-
-
-class AppInitError : public FatalError
-{ 
-public:
-    AppInitError(const std::string& message)
-      : FatalError("AppInitError", message)
-    { }
-};
-
-
-class App
+class App : public InputEventHandler
 {
 public:
-    AssetManager asset;
-    Graphics graphics;
-    Input input;
+    ImageLoader image_loader;
+    ModelLoader model_loader;
+
+    GraphicsContext gc;
+    GeometryManager geometry_manager;
+    GeometryGenerator geometry_generator;
+    ImageManager image_manager;
+    InputQueue input;
+    MaterialManager material_manager;
+    ModelManager model_manager;
+    ShaderManager shader_manager;
     Window window;
+
+    Scene scene;
+    SceneRenderer scene_renderer;
 
     App();
     virtual ~App();
-     
-    void initiate(const AppConfig& config);
-    void terminate();
 
-    void poll();
+    void run();
+    void handle(const KeyboardInputEvent& event) override;
 
 private:
-    static void handle_char_(GLFWwindow* window, unsigned int code_point);
-    static void handle_key_(GLFWwindow* window, int key, int scancode, int action, int mods);
-    static void handle_cursor_pos_(GLFWwindow* window, double x, double y);
-    static void handle_mouse_button_(GLFWwindow* window, int button, int action, int mods);
-    static void handle_scroll_(GLFWwindow* window, double dx, double dy);
-    static void handle_framebuffer_size_(GLFWwindow* window, int width, int height);
+    bool is_running_ = false;
 
-    GLFWwindow* glfw_window_ = nullptr;
+    void init_();
+    void destroy_();
+    void poll_();
+    void setup_scene_();
 };
 
 

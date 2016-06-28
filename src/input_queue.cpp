@@ -2,74 +2,79 @@
 
 namespace dragonslave {
 
-
+    
 InputQueue::InputQueue() { }
 
 
 InputQueue::~InputQueue() { }
 
 
-bool InputQueue::has_events() const
+void InputQueue::on_key(int key, int scancode, int action, int mods)
 {
-    return !input_queue_.empty();
-}
-
-
-const InputEvent* InputQueue::next_event() const
-{
-    return input_queue_.front().get();
-}
-
-
-void InputQueue::pop_event()
-{
-    return input_queue_.pop();
-}
-
-
-void InputQueue::reset()
-{
-    while (!input_queue_.empty()) input_queue_.pop();
-    seen_mouse_motion_ = false;
-    mouse_x_ = -1.0f;
-    mouse_y_ = -1.0f;
-}
-
-
-void InputQueue::on_keyboard(int key, int scancode, int action, int mods)
-{
-    input_queue_.push(std::make_unique<KeyboardInputEvent>(
-        key, scancode, action, mods));
+    std::lock_guard<std::mutex> lock (queue_mutex_);
+    queue_.push_back(std::make_unique<KeyboardInputEvent>(
+                key, scancode, action, mods));
 }
 
 
 void InputQueue::on_mouse_button(int button, int action, int mods)
 {
-    input_queue_.push(std::make_unique<MouseButtonInputEvent>(
-        mouse_x_, mouse_y_, button, action, mods));
+    std::lock_guard<std::mutex> lock (queue_mutex_);
+    queue_.push_back(std::make_unique<MouseButtonInputEvent>(
+                cursor_x_, cursor_y_, button, action, mods));
 }
 
 
 void InputQueue::on_mouse_motion(double x, double y)
 {
-    double dx = 0.0f;
-    double dy = 0.0f;
-    if (seen_mouse_motion_) {
-        dx = x - mouse_x_;
-        dy = y - mouse_y_;
+    double dx = 0.; 
+    double dy = 0.;
+    if (seen_cursor_) {
+        dx = x - cursor_x_;
+        dy = y - cursor_y_;
+    } else {
+        seen_cursor_ = true;
     }
-    seen_mouse_motion_ = true;
-    input_queue_.push(std::make_unique<MouseMotionInputEvent>(
-        mouse_x_, mouse_y_, dx, dy));
+    cursor_x_ = x;
+    cursor_y_ = y;
+    std::lock_guard<std::mutex> lock (queue_mutex_);
+    queue_.push_back(std::make_unique<MouseMotionInputEvent>(
+                cursor_x_, cursor_y_, dx, dy));
 }
 
 
 void InputQueue::on_mouse_scroll(double scroll_x, double scroll_y)
 {
-    input_queue_.push(std::make_unique<MouseScrollInputEvent>(
-        mouse_x_, mouse_y_, scroll_x, scroll_y));
+    std::lock_guard<std::mutex> lock (queue_mutex_);
+    queue_.push_back(std::make_unique<MouseScrollInputEvent>(
+                cursor_x_, cursor_y_, scroll_x, scroll_y));
+}
+
+
+void InputQueue::add_handler(InputEventHandler* handler)
+{
+    event_channel_.add(handler);
+}
+
+
+void InputQueue::remove_handler(InputEventHandler* handler)
+{
+    event_channel_.remove(handler);
+}
+
+
+void InputQueue::flush_events()
+{
+    std::vector<std::unique_ptr<InputEvent> > local_queue;
+    {
+        std::lock_guard<std::mutex> lock (queue_mutex_);
+         local_queue = std::move(queue_);
+         queue_.clear();
+    }
+    for (auto& event_ptr : local_queue) {
+        event_channel_.broadcast(*event_ptr);
+    }
 }
 
 
 }
-

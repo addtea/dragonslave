@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "model_manager.hpp"
 
 namespace dragonslave {
@@ -11,89 +9,59 @@ ModelManager::ModelManager() { }
 ModelManager::~ModelManager() { }
 
 
-void ModelManager::set_loader(ModelLoader* loader)
+void ModelManager::initialize(
+        GeometryManager* geometry_manager,
+        MaterialManager* material_manager,
+        ImageManager* image_manager,
+        ShaderManager* shader_manager,
+        ModelLoader* model_loader)
 {
-    loader_ = loader;
+    geometry_manager_ = geometry_manager;
+    material_manager_ = material_manager;
+    image_manager_ = image_manager;
+    shader_manager_ = shader_manager;
+    model_loader_ = model_loader;
 }
 
 
-Model& ModelManager::create_model()
+void ModelManager::terminate()
 {
-    std::list<Model>::iterator it = create_model_it_();
-    return *it;
+    geometry_manager_ = nullptr;
+    material_manager_ = nullptr;
+    image_manager_ = nullptr;
+    model_loader_ = nullptr;
 }
 
 
-Model& ModelManager::create_named_model(const std::string& name)
-{
-    validate_name_(name);
-    std::list<Model>::iterator it = create_model_it_();
-    model_lookup_[name] = it;
-    return *it;
-}
-
-
-Model& ModelManager::load_model(const std::string& path)
-{
-    std::unordered_map<
-            std::string,
-            std::list<Model>::iterator>::const_iterator
-        mit = path_cache_.find(path);
-    if (mit != path_cache_.end())
-        return *mit->second;
-    std::list<Model>::iterator it = create_model_it_();
-    path_cache_[path] = it;
-    loader_->load_model_from_file(path, *it);
-    return *it;
-}
-
-
-Model& ModelManager::load_named_model(const std::string& name, const std::string& path)
-{
-    validate_name_(name);
-    std::unordered_map<
-            std::string,
-            std::list<Model>::iterator>::const_iterator
-        mit = path_cache_.find(path);
-    if (mit != path_cache_.end()) {
-        model_lookup_[name] = mit->second; 
-        return *mit->second;
-    }
-    std::list<Model>::iterator it = create_model_it_();
-    path_cache_[path] = it;
-    model_lookup_[name] = it;
-    loader_->load_model_from_file(path, *it);
-    return *it;
-}
-
-
-Model* ModelManager::get_model(const std::string& name)
-{
-    std::unordered_map<
-            std::string,
-            std::list<Model>::iterator>::const_iterator
-        mit = model_lookup_.find(name);
-    if (mit == model_lookup_.end()) 
-        return nullptr;
-    return &*mit->second;
-}
-
-
-void ModelManager::validate_name_(const std::string& name)
-{
-    std::unordered_map<
-            std::string,
-            std::list<Model>::iterator>::const_iterator
-        mit = model_lookup_.find(name);
-    if (mit != model_lookup_.end()) 
-        throw DuplicateError("Model", name);
-}
-
-
-std::list<Model>::iterator ModelManager::create_model_it_()
+Model* ModelManager::create_model()
 {
     models_.emplace_back();
-    return std::prev(models_.end());
+    return &models_.back();
+}
+
+
+Model* ModelManager::load_model(const std::string& path)
+{
+    Model* model = create_model();
+    model_loader_->load_model(
+        geometry_manager_,
+        material_manager_,
+        image_manager_,
+        shader_manager_,
+        path,
+        model);
+    return model;
+}
+
+
+void ModelManager::destroy_model(Model* model)
+{
+    std::remove_if(
+        models_.begin(),
+        models_.end(),
+        [=](Model& stored_model){ 
+            return &stored_model == model;
+        });
 }
 
 

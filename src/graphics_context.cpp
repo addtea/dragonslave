@@ -1,28 +1,29 @@
+#include <algorithm>
 #include <fstream>
-
+#include "graphics_context.hpp"
 #include "error.hpp"
-#include "graphics.hpp"
+#include "log.hpp"
 
 namespace dragonslave {
 
 
-Graphics::Graphics() { }
+GraphicsContext::GraphicsContext() { }
 
 
-Graphics::~Graphics() { }
+GraphicsContext::~GraphicsContext() { }
 
 
-void Graphics::initiate() 
+void GraphicsContext::initialize(Window* window) 
 { 
+    window->make_current();
     glewExperimental = true;
     if (glewInit() != GLEW_OK) {
-        throw InitGlewError();
     }
     glGetError();
 }
 
 
-void Graphics::terminate()
+void GraphicsContext::terminate()
 {
     for (GLuint shader : shaders_) {
         glDeleteShader(shader);
@@ -38,11 +39,12 @@ void Graphics::terminate()
 }
 
 
-GLuint Graphics::load_shader(GLenum type, const std::string& path)
+GLuint GraphicsContext::load_shader(GLenum type, const std::string& path)
 {
     std::ifstream in (path);
     if (!in.is_open()) {
-        throw FileNotFoundError(path); 
+        LOG(DEBUG) << "Could not open file, \"" << path << "\"";
+        throw FatalError("FileNotFoundError", "Failed to open file");
     }
     GLuint shader = glCreateShader(type);
     int file_size = 0;
@@ -65,7 +67,8 @@ GLuint Graphics::load_shader(GLenum type, const std::string& path)
         std::vector<GLchar> log_buffer (log_length);
         glGetShaderInfoLog(shader, log_length, &log_length, log_buffer.data());
         std::string log (log_buffer.data(), static_cast<size_t>(log_length - 1));
-        throw ShaderCompileError(path, log);
+        LOG(DEBUG) << "Dumping log:\n" << log;
+        throw FatalError("ShaderCompileError", "Failed to compile shader");
     }
 
     shaders_.push_back(shader);
@@ -73,7 +76,7 @@ GLuint Graphics::load_shader(GLenum type, const std::string& path)
 }
 
 
-GLuint Graphics::load_program(const std::vector<GLuint>& shaders)
+GLuint GraphicsContext::load_program(const std::vector<GLuint>& shaders)
 {
     GLuint program = glCreateProgram();    
 
@@ -91,7 +94,8 @@ GLuint Graphics::load_program(const std::vector<GLuint>& shaders)
         std::vector<GLchar> log_buffer (log_length);
         glGetProgramInfoLog(program, log_length, &log_length, log_buffer.data());
         std::string log (log_buffer.data(), static_cast<size_t>(log_length - 1));
-        throw ProgramLinkError(log);
+        LOG(DEBUG) << "Dumping log:\n" << log;
+        throw FatalError("ProgramLinkError", "Failed to link program");
     }
 
     for (GLuint shader : shaders) {
@@ -103,7 +107,7 @@ GLuint Graphics::load_program(const std::vector<GLuint>& shaders)
 }
 
 
-GLuint Graphics::create_vertex_array()
+GLuint GraphicsContext::create_vertex_array()
 {
     GLuint vertex_array;
     glGenVertexArrays(1, &vertex_array);
@@ -112,7 +116,7 @@ GLuint Graphics::create_vertex_array()
 }
 
 
-GLuint Graphics::create_buffer()
+GLuint GraphicsContext::create_buffer()
 {
     GLuint buffer;
     glGenBuffers(1, &buffer);
@@ -121,13 +125,50 @@ GLuint Graphics::create_buffer()
 }
 
 
-GLuint Graphics::create_texture()
+GLuint GraphicsContext::create_texture()
 {
     GLuint texture;
     glGenTextures(1, &texture);
     textures_.push_back(texture);
     return texture;
 }
+
+
+void GraphicsContext::destroy_buffer(GLuint buffer)
+{
+    glDeleteBuffers(1, &buffer);
+    std::remove(buffers_.begin(), buffers_.end(), buffer);
+}
+
+
+void GraphicsContext::destroy_program(GLuint program)
+{
+    glDeleteProgram(program);
+    std::remove(programs_.begin(), programs_.end(), program);
+}
+
+
+void GraphicsContext::destroy_shader(GLuint shader)
+{
+    glDeleteShader(shader);
+    std::remove(shaders_.begin(), shaders_.end(), shader);
+}
+
+
+void GraphicsContext::destroy_texture(GLuint texture)
+{
+    glDeleteTextures(1, &texture);
+    std::remove(textures_.begin(), textures_.end(), texture);
+}
+
+
+void GraphicsContext::destroy_vertex_array(GLuint vertex_array)
+{
+    glDeleteVertexArrays(1, &vertex_array);
+    std::remove(vertex_arrays_.begin(), vertex_arrays_.end(), vertex_array);
+}
+
+
 
 
 }
