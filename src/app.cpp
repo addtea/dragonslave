@@ -203,6 +203,7 @@ void App::handle(const MouseScrollInputEvent& event)
 {
     float camera_speed = 0.02f;
     gs.camera->translate(static_cast<float>(event.scroll_y) * gs.camera->get_forward());
+    gs.camera->update_view();
 }
 
 
