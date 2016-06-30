@@ -11,7 +11,7 @@ BasicShader::BasicShader() { }
 BasicShader::~BasicShader() { }
 
 
-void BasicShader::activate() 
+void BasicShader::use() 
 {
     glUseProgram(program_);
 }

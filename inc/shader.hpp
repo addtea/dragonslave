@@ -17,7 +17,7 @@ public:
     void create(GraphicsContext* gc);
     void destroy();
 
-    virtual void activate() = 0;
+    virtual void use() = 0;
     virtual void set_view_projection(
         const glm::mat4& view,
         const glm::mat4& projection) = 0;

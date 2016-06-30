@@ -11,7 +11,7 @@ public:
     BasicShader();
     virtual ~BasicShader();
 
-    void activate() override;
+    void use() override;
     void set_view_projection(
         const glm::mat4& view,
         const glm::mat4& projection) override;
