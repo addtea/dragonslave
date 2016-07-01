@@ -1,15 +1,15 @@
-#include "model.hpp"
+#include "mesh.hpp"
 
 namespace dragonslave {
 
 
-Model::Model() { }
+Mesh::Mesh() { }
 
 
-Model::~Model() { }
+Mesh::~Mesh() { }
 
 
-void Model::create() 
+void Mesh::create() 
 { 
     bound.is_null = true;
     bound.is_infinite = false;
@@ -18,31 +18,31 @@ void Model::create()
 }
 
 
-void Model::destroy() 
+void Mesh::destroy() 
 { 
     reset();
 }
 
 
-void Model::add_mesh(Geometry* geometry, Material* material, Shader* shader)
+void Mesh::add_submesh(Geometry* geometry, Material* material, Shader* shader)
 {
-    meshes_.push_back({geometry, material, shader});
+    submeshes_.push_back({geometry, material, shader});
 }
 
 
-void Model::update_bound()
+void Mesh::update_bound()
 {
-    // Check for empty mesh
-    if (meshes_.empty() || meshes_.front().geometry->positions.empty()) {
+    // Check for empty submesh
+    if (submeshes_.empty() || submeshes_.front().geometry->positions.empty()) {
         bound.is_null = true;
         return;
     }
     // Using bouncing bubble algorithm
-    bound.center = meshes_.front().geometry->positions.front();
+    bound.center = submeshes_.front().geometry->positions.front();
     bound.radius = 0.1f;
     for (int i = 0; i < 2; i++) {
-        for (Mesh& mesh : meshes_) {
-            for (const glm::vec3& position: mesh.geometry->positions) {
+        for (Submesh& submesh : submeshes_) {
+            for (const glm::vec3& position: submesh.geometry->positions) {
                 glm::vec3 diff = position - bound.center;
                 float diff_len = glm::length(diff);
                 if (diff_len > bound.radius) {
@@ -56,8 +56,8 @@ void Model::update_bound()
             }
         }
     }
-    for (Mesh& mesh : meshes_) {
-        for (const glm::vec3& position: mesh.geometry->positions) {
+    for (Submesh& submesh : submeshes_) {
+        for (const glm::vec3& position: submesh.geometry->positions) {
             glm::vec3 diff = position - bound.center;
             float diff_len = glm::length(diff);
             if (diff_len > bound.radius) {
@@ -69,9 +69,9 @@ void Model::update_bound()
 }
 
 
-void Model::reset() 
+void Mesh::reset() 
 {
-    meshes_.clear();
+    submeshes_.clear();
 }
 
 

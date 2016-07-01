@@ -9,46 +9,46 @@
 #include "image_manager.hpp"
 #include "material_manager.hpp"
 #include "shader_manager.hpp"
-#include "model.hpp"
+#include "mesh.hpp"
 
 namespace dragonslave {
 
 
-class ModelLoader
+class MeshLoader
 {
 public:
-    ModelLoader();
-    virtual ~ModelLoader();
+    MeshLoader();
+    virtual ~MeshLoader();
 
-    void load_model(
+    void load_mesh(
         GeometryManager* geometry_manager,
         MaterialManager* material_manager,
         ImageManager* image_manager,
         ShaderManager* shader_manager,
         const std::string& path,
-        Model* model);
+        Mesh* mesh);
 
 private:
-    void process_geometry_(
-        aiMesh* ai_mesh,
-        Geometry* geometry);
     void process_material_(
         ImageManager* image_manager,
         aiMaterial* ai_material, 
         const std::string& base_dir, 
         Material* material);
+    void process_geometry_(
+        aiMesh* ai_mesh,
+        Geometry* geometry);
     void load_materials_(
         MaterialManager* material_manager,
         ImageManager* image_manager,
         const aiScene* scene, 
         const std::string& base_dir, 
         std::vector<Material*>& materials);
-    void load_meshes_(
+    void load_mesh_(
         GeometryManager* geometry_manager,
         ShaderManager* shader_manager,
         const aiScene* scene, 
         const std::vector<Material*>& materials, 
-        Model* model);
+        Mesh* mesh);
 };
 
 

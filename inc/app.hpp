@@ -8,8 +8,8 @@
 #include "image_manager.hpp"
 #include "input_queue.hpp"
 #include "material_manager.hpp"
-#include "model_loader.hpp"
-#include "model_manager.hpp"
+#include "mesh_loader.hpp"
+#include "mesh_manager.hpp"
 #include "scene.hpp"
 #include "scene_renderer.hpp"
 #include "shader_manager.hpp"
@@ -22,7 +22,7 @@ class App : public InputEventHandler
 {
 public:
     ImageLoader image_loader;
-    ModelLoader model_loader;
+    MeshLoader mesh_loader;
 
     GraphicsContext gc;
     GeometryManager geometry_manager;
@@ -30,7 +30,7 @@ public:
     ImageManager image_manager;
     InputQueue input;
     MaterialManager material_manager;
-    ModelManager model_manager;
+    MeshManager mesh_manager;
     ShaderManager shader_manager;
     Window window;
 

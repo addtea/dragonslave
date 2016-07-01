@@ -1,6 +1,6 @@
 #pragma once
 
-#include "model.hpp"
+#include "mesh.hpp"
 #include "scene_node.hpp"
 
 namespace dragonslave {
@@ -11,7 +11,7 @@ class SceneEntity : public SceneNode
 public:
     glm::vec3 scale;
     glm::mat4 model_matrix;
-    Model* model;
+    Mesh* mesh;
 
     SceneEntity();
     virtual ~SceneEntity();

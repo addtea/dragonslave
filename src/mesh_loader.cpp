@@ -1,21 +1,21 @@
-#include "model_loader.hpp"
+#include "mesh_loader.hpp"
 
 namespace dragonslave {
 
 
-ModelLoader::ModelLoader() { }
+MeshLoader::MeshLoader() { }
 
 
-ModelLoader::~ModelLoader() { }
+MeshLoader::~MeshLoader() { }
 
 
-void ModelLoader::load_model(
+void MeshLoader::load_mesh(
         GeometryManager* geometry_manager,
         MaterialManager* material_manager,
         ImageManager* image_manager,
         ShaderManager* shader_manager,
         const std::string& path,
-        Model* model)
+        Mesh* mesh)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
@@ -27,42 +27,11 @@ void ModelLoader::load_model(
     std::vector<Material*> materials;
 
     load_materials_(material_manager, image_manager, scene, base_dir, materials);
-    load_meshes_(geometry_manager, shader_manager, scene, materials, model);
+    load_mesh_(geometry_manager, shader_manager, scene, materials, mesh);
 }
 
 
-void ModelLoader::process_geometry_(aiMesh* ai_mesh, Geometry* geometry)
-{
-    geometry->has_normals = true;
-    geometry->has_tex_coords = ai_mesh->mTextureCoords[0] != nullptr;
-    for (int i = 0; i < ai_mesh->mNumVertices; i++) {
-        geometry->positions.emplace_back(
-            static_cast<float>(ai_mesh->mVertices[i].x),
-            static_cast<float>(ai_mesh->mVertices[i].y),
-            static_cast<float>(ai_mesh->mVertices[i].z));
-        geometry->normals.emplace_back(
-            static_cast<float>(ai_mesh->mNormals[i].x),
-            static_cast<float>(ai_mesh->mNormals[i].y),
-            static_cast<float>(ai_mesh->mNormals[i].z));
-        if (geometry->has_tex_coords) {
-            geometry->tex_coords.emplace_back(
-                static_cast<float>(ai_mesh->mTextureCoords[0][i].x),
-                static_cast<float>(ai_mesh->mTextureCoords[0][i].y));
-        }
-    }
-
-    for(int i = 0; i < ai_mesh->mNumFaces; i++)
-    {
-        aiFace& face = ai_mesh->mFaces[i];
-        for(int j = 0; j < face.mNumIndices; j++)
-            geometry->indices.push_back(face.mIndices[j]);
-    }
-
-    geometry->upload();
-}
-
-
-void ModelLoader::process_material_(
+void MeshLoader::process_material_(
         ImageManager* image_manager,
         aiMaterial* ai_material, 
         const std::string& base_dir,
@@ -128,7 +97,38 @@ void ModelLoader::process_material_(
 }
 
 
-void ModelLoader::load_materials_(
+void MeshLoader::process_geometry_(aiMesh* ai_mesh, Geometry* geometry)
+{
+    geometry->has_normals = true;
+    geometry->has_tex_coords = ai_mesh->mTextureCoords[0] != nullptr;
+    for (int i = 0; i < ai_mesh->mNumVertices; i++) {
+        geometry->positions.emplace_back(
+            static_cast<float>(ai_mesh->mVertices[i].x),
+            static_cast<float>(ai_mesh->mVertices[i].y),
+            static_cast<float>(ai_mesh->mVertices[i].z));
+        geometry->normals.emplace_back(
+            static_cast<float>(ai_mesh->mNormals[i].x),
+            static_cast<float>(ai_mesh->mNormals[i].y),
+            static_cast<float>(ai_mesh->mNormals[i].z));
+        if (geometry->has_tex_coords) {
+            geometry->tex_coords.emplace_back(
+                static_cast<float>(ai_mesh->mTextureCoords[0][i].x),
+                static_cast<float>(ai_mesh->mTextureCoords[0][i].y));
+        }
+    }
+
+    for(int i = 0; i < ai_mesh->mNumFaces; i++)
+    {
+        aiFace& face = ai_mesh->mFaces[i];
+        for(int j = 0; j < face.mNumIndices; j++)
+            geometry->indices.push_back(face.mIndices[j]);
+    }
+
+    geometry->upload();
+}
+
+
+void MeshLoader::load_materials_(
         MaterialManager* material_manager,
         ImageManager* image_manager,
         const aiScene* scene, 
@@ -144,12 +144,12 @@ void ModelLoader::load_materials_(
 }
 
 
-void ModelLoader::load_meshes_(
+void MeshLoader::load_mesh_(
         GeometryManager* geometry_manager,
         ShaderManager* shader_manager,
         const aiScene* scene,
         const std::vector<Material*>& materials,
-        Model* model)
+        Mesh* mesh)
 {
     for (int i = 0; i < scene->mNumMeshes; i++) {
         aiMesh* ai_mesh = scene->mMeshes[i];
@@ -159,7 +159,7 @@ void ModelLoader::load_meshes_(
         Material* material = nullptr;
         material = materials.at(ai_mesh->mMaterialIndex);
         Shader* shader = shader_manager->get_default_shader();
-        model->add_mesh(geometry, material, shader);
+        mesh->add_submesh(geometry, material, shader);
     }
 }
 

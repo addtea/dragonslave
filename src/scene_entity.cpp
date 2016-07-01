@@ -16,7 +16,7 @@ void SceneEntity::create(Scene* scene)
     SceneNode::create(scene);
     scale = glm::vec3{1.f, 1.f, 1.f};
     world_matrix = glm::mat4{1.f};
-    model = nullptr;
+    mesh = nullptr;
 }
 
 

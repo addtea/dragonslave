@@ -47,19 +47,19 @@ void SceneRenderer::render()
     // TODO(eugene): Add state sorting and state-aware rendering
     Shader* prev_shader = nullptr;
     for (SceneEntity* entity : visitor.get_visible_entities()) {
-        for (Mesh& mesh : entity->model->get_meshes()) {
-            if (prev_shader != mesh.shader) {
-                mesh.shader->use();
-                mesh.shader->set_view_projection(
+        for (Submesh& submesh : entity->mesh->get_submeshes()) {
+            if (prev_shader != submesh.shader) {
+                submesh.shader->use();
+                submesh.shader->set_view_projection(
                     active_camera_->view_matrix,
                     active_camera_->projection_matrix);
-                prev_shader = mesh.shader;
+                prev_shader = submesh.shader;
             }
-            mesh.shader->set_material(mesh.material);
-            mesh.geometry->bind();
-            mesh.shader->draw(
+            submesh.shader->set_material(submesh.material);
+            submesh.geometry->bind();
+            submesh.shader->draw(
                 entity->model_matrix,
-                mesh.geometry);
+                submesh.geometry);
         }
     }
 }

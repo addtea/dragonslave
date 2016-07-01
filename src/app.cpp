@@ -14,7 +14,7 @@ struct GameState
 {
     SceneCamera* camera = nullptr;
     SceneEntity* cursor = nullptr;
-    Model* obstacle_model = nullptr;
+    Mesh* obstacle_mesh = nullptr;
 };
 
 
@@ -71,12 +71,12 @@ void App::init_()
     material_manager.initialize();
     image_manager.initialize(&gc, &image_loader);
     shader_manager.initialize(&gc);
-    model_manager.initialize(
+    mesh_manager.initialize(
         &geometry_manager,
         &material_manager,
         &image_manager,
         &shader_manager,
-        &model_loader);
+        &mesh_loader);
 }
 
 
@@ -108,22 +108,22 @@ void App::setup_scene_()
     selected_mat->diffuse_color = glm::vec3{0.0f, 1.f, 0.0f};
     obstacle_mat->diffuse_color = glm::vec3{1.0f, 1.f, 1.0f};
 
-    Model* ground_model = model_manager.create_model();
-    ground_model->add_mesh(plane, ground_mat, shader);
+    Mesh* ground_mesh = mesh_manager.create_mesh();
+    ground_mesh->add_submesh(plane, ground_mat, shader);
 
-    Model* cursor_model = model_manager.create_model();
-    cursor_model->add_mesh(cylinder, selected_mat, shader);
+    Mesh* cursor_mesh = mesh_manager.create_mesh();
+    cursor_mesh->add_submesh(cylinder, selected_mat, shader);
 
-    gs.obstacle_model = model_manager.create_model();
-    gs.obstacle_model->add_mesh(cube, obstacle_mat, shader);
+    gs.obstacle_mesh = mesh_manager.create_mesh();
+    gs.obstacle_mesh->add_submesh(cube, obstacle_mat, shader);
 
     SceneEntity* ground_entity = scene.create_entity();
-    ground_entity->model = ground_model;
+    ground_entity->mesh = ground_mesh;
     ground_entity->scale = glm::vec3{64.5f, 0.f, 64.5f};
 
     gs.cursor = scene.create_entity();
     gs.cursor->position = glm::vec3{0.f, 0.1f, 0.f};
-    gs.cursor->model = cursor_model;
+    gs.cursor->mesh = cursor_mesh;
     gs.cursor->scale = glm::vec3{0.55f, 0.2f, 0.55f};
 
     scene.get_root()->add_child(ground_entity);
@@ -144,7 +144,7 @@ void App::setup_scene_()
 
 
 void App::destroy_() {
-    model_manager.terminate();
+    mesh_manager.terminate();
     shader_manager.terminate();
     image_manager.terminate();
     material_manager.terminate();
@@ -191,7 +191,7 @@ void App::handle(const MouseButtonInputEvent& event)
 {
     if (event.button == 0 && event.action == GLFW_RELEASE) {
         SceneEntity* obstacle = scene.create_entity();
-        obstacle->model = gs.obstacle_model;
+        obstacle->mesh = gs.obstacle_mesh;
         obstacle->position = gs.cursor->position;
         obstacle->position.y = 0.5f;
         scene.get_root()->add_child(obstacle);
