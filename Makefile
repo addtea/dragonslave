@@ -6,9 +6,9 @@ BUILD_DIR	:= .build
 DOC_DIR		:= doc
 
 CC			:= clang++
-CFLAGS		:= -std=c++14 -O2
+CFLAGS		:= -std=c++14 -O0 -g
 INCS		:= -I$(INC_DIR)
-LIBS		:= -lGL -lGLEW -lglfw -lassimp -lfreeimage
+LIBS		:= -pthreads -lGL -lGLEW -lglfw -lassimp -lfreeimage
 SOURCES		:= $(shell find $(SRC_DIR) -name '*.cpp' -type 'f' | sort)
 HEADERS		:= $(shell find $(INC_DIR) -name '*.hpp' -type 'f' | sort)
 OBJECTS		:= $(SOURCES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)

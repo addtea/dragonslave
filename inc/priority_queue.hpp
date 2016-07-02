@@ -8,11 +8,11 @@ namespace dragonslave {
 template <typename TData>
 struct PriorityQueueNode 
 {
-    TData* data = nullptr;
+    TData  data;
     int    index = -1;
     double priority = 0.f;
 
-    PriorityQueueNode(TData* data)
+    PriorityQueueNode(TData data)
       : data {data}
     { }
 };
@@ -25,11 +25,12 @@ public:
     PriorityQueue() { }
     virtual ~PriorityQueue() { }
 
-    TData* get_front() const;
+    bool is_empty() const { return heap_.empty(); }
+    TData get_front() const;
 
-    PriorityQueueNode<TData>* enqueue(TData* data);
+    PriorityQueueNode<TData>* enqueue(TData data, double priority);
     void dequeue();
-    void update(PriorityQueueNode<TData>* node);
+    void update(PriorityQueueNode<TData>* node, double priority);
     void clear();
 
 private:
@@ -38,9 +39,9 @@ private:
 
 
 template <typename TData>
-TData* PriorityQueue<TData>::get_front() const
+TData PriorityQueue<TData>::get_front() const
 {
-    if (heap_.is_empty()) {
+    if (heap_.empty()) {
         return nullptr;
     }
     return heap_.front()->data;
@@ -48,12 +49,12 @@ TData* PriorityQueue<TData>::get_front() const
 
 
 template <typename TData>
-PriorityQueueNode<TData>* PriorityQueue<TData>::enqueue(TData* data)
+PriorityQueueNode<TData>* PriorityQueue<TData>::enqueue(TData data, double priority)
 {
     heap_.push_back(std::make_unique<PriorityQueueNode<TData> >(data));
     PriorityQueueNode<TData>* node = heap_.back().get();
     node->index = heap_.size() - 1;
-    update(node);
+    update(node, priority);
     return node;
 }
 
@@ -63,6 +64,8 @@ void PriorityQueue<TData>::dequeue()
 {
     heap_.front().swap(heap_.back());
     heap_.pop_back();
+    if (heap_.empty())
+        return;
     PriorityQueueNode<TData>* node = heap_.front().get();
     node->index = 0;
     while (2 * node->index + 1 < heap_.size()) {
@@ -82,8 +85,9 @@ void PriorityQueue<TData>::dequeue()
 
 
 template <typename TData>
-void PriorityQueue<TData>::update(PriorityQueueNode<TData>* node)
+void PriorityQueue<TData>::update(PriorityQueueNode<TData>* node, double priority)
 {
+    node->priority = priority;
     while (node->index) {
         PriorityQueueNode<TData>* parent = heap_[node->index / 2].get();
         if (parent->priority >= node->priority) break;

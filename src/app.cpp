@@ -1,13 +1,16 @@
+#include <algorithm>
+#include <limits>
+#include <thread>
 #include <vector>
-#include <unordered_map>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "app.hpp"
 #include "log.hpp"
-#include "shaders/basic_shader.hpp"
 #include "nav_grid.hpp"
+#include "priority_queue.hpp"
+#include "shaders/basic_shader.hpp"
 
 namespace dragonslave {
 
@@ -19,7 +22,9 @@ struct GameState
     float cursor_y;
     int grid_x;
     int grid_y;
-
+    bool has_from = false;
+    int from_x;
+    int from_y;
     float magnify = 1.f;
 
     Geometry* path_geometry = nullptr;
@@ -48,16 +53,17 @@ void update_cursor()
         : glm::vec3{0.f, 1.f, 0.f};
     gs.camera->update_view();
     gs.cursor_entity->need_world_update();
-    gs.path_geometry->type = GL_LINE_STRIP;
-    gs.path_geometry->positions.push_back(gs.cursor_entity->position);
-    gs.path_geometry->indices.push_back(gs.path_geometry->indices.size());
-    gs.path_geometry->upload();
 }
 
 
-int hash_location(int x, int y)
+int hash_location(NavGridLocation location)
 {
-    return y * gs.grid.get_width() + x;
+    return location.y * gs.grid.get_width() + location.x;
+}
+
+NavGridLocation unhash_location(int hash)
+{
+    return {hash % gs.grid.get_width(), hash / gs.grid.get_width()};
 }
 
 
@@ -65,7 +71,7 @@ void toggle_block(Scene* scene)
 {
     if (!gs.grid.check_bound({gs.grid_x, gs.grid_y})) return;
     SceneEntity* block = nullptr;
-    int location_id = hash_location(gs.grid_x, gs.grid_y);
+    int location_id = hash_location({gs.grid_x, gs.grid_y});
     if ((block = gs.block_map[location_id])) {
         scene->destroy_entity(block);
         gs.block_map[location_id] = nullptr;
@@ -82,8 +88,119 @@ void toggle_block(Scene* scene)
 }
 
 
-void find_path(int from_x, int from_y, int to_x, int to_y)
+float heuristic_cost(NavGridLocation from, NavGridLocation to) 
 {
+    float diff_x = to.x - from.x;
+    float diff_y = to.y - from.y;
+    return glm::sqrt(diff_x * diff_x + diff_y * diff_y);
+}
+
+
+struct AiNode
+{
+    int id = 0;
+    bool visited = false;
+    AiNode* prev_node = nullptr;
+    float true_score = 0.f;
+    float guess_score = 0.f;
+    PriorityQueueNode<AiNode*>* pq_node = nullptr;
+};
+
+
+void update_prev(const std::vector<AiNode>& nodes)
+{
+    gs.prev_geometry->type = GL_LINES;
+    gs.prev_geometry->positions.clear();
+    gs.prev_geometry->indices.clear();
+    for (const auto& node : nodes) {
+       if (node.prev_node) {
+           NavGridLocation cur_pos = unhash_location(node.id);
+           NavGridLocation prev_pos = unhash_location(node.prev_node->id);
+           glm::vec3 tangent = glm::normalize(glm::vec3{prev_pos.y - cur_pos.y, 0.f, cur_pos.x - prev_pos.x});
+           glm::vec3 cur_gpos {cur_pos.x + 0.5f, 0.5f, cur_pos.y + 0.5f};
+           glm::vec3 prev_gpos {prev_pos.x + 0.5f, 0.5f, prev_pos.y + 0.5f};
+           glm::vec3 cur_a_gpos = 0.8f * cur_gpos + 0.2f * prev_gpos + 0.1f * tangent;
+           glm::vec3 cur_b_gpos = 0.8f * cur_gpos + 0.2f * prev_gpos - 0.1f * tangent;
+           int last_id = gs.prev_geometry->positions.size();
+           gs.prev_geometry->positions.push_back(cur_gpos);
+           gs.prev_geometry->positions.push_back(cur_a_gpos);
+           gs.prev_geometry->positions.push_back(cur_b_gpos);
+           gs.prev_geometry->positions.push_back(prev_gpos);
+           gs.prev_geometry->indices.push_back(last_id);
+           gs.prev_geometry->indices.push_back(last_id + 1);
+           gs.prev_geometry->indices.push_back(last_id);
+           gs.prev_geometry->indices.push_back(last_id + 2);
+           gs.prev_geometry->indices.push_back(last_id);
+           gs.prev_geometry->indices.push_back(last_id + 3);
+       }
+    }
+}
+
+
+void update_path(const std::vector<AiNode>& nodes, NavGridLocation to)
+{
+    gs.path_geometry->type = GL_LINE_STRIP;
+    gs.path_geometry->positions.clear();
+    gs.path_geometry->indices.clear();
+    const AiNode* to_node = &nodes[hash_location(to)];
+    do {
+        NavGridLocation loc = unhash_location(to_node->id);
+        gs.path_geometry->positions.push_back({loc.x + 0.5f, 1.5f, loc.y + 0.5f});
+        gs.path_geometry->indices.push_back(gs.path_geometry->indices.size());
+        to_node = to_node->prev_node;
+    } while (to_node != nullptr) ;
+    gs.path_geometry->upload();
+}
+
+
+
+void find_path(NavGridLocation from, NavGridLocation to)
+{
+    int grid_size = gs.grid.get_width() * gs.grid.get_height();
+    int from_id = hash_location(from);
+
+    std::vector<AiNode> nodes (grid_size);
+    for (int i = 0; i < nodes.size(); i++) {
+        AiNode& node = nodes[i];
+        node.id = i;
+        node.visited = false;
+        node.prev_node = nullptr;
+        node.true_score = std::numeric_limits<float>::max();
+        node.guess_score = std::numeric_limits<float>::max();
+        node.pq_node = nullptr;
+    }
+    nodes[from_id].true_score = 0.f;
+    nodes[from_id].guess_score = heuristic_cost(unhash_location(from_id), to);
+    PriorityQueue<AiNode*> pq;
+    nodes[from_id].pq_node = pq.enqueue(&nodes[from_id], -nodes[from_id].guess_score);
+    update_prev(nodes);
+    while (!pq.is_empty()) {
+        AiNode* current = pq.get_front();
+        pq.dequeue();
+        current->pq_node = nullptr;
+        current->visited = true;
+        if (current->id == hash_location(to)) {
+            break;
+        }
+        for (const NavGridLocation& adj : gs.grid.get_adjacent(unhash_location(current->id))) {
+            AiNode* adj_node = &nodes[hash_location(adj)];
+            if (adj_node->visited) 
+                continue;
+            float new_score = current->true_score + 1;
+            if (new_score >= adj_node->true_score)
+                continue;
+            adj_node->prev_node = current;
+            adj_node->true_score = new_score;
+            adj_node->guess_score = new_score + heuristic_cost(unhash_location(adj_node->id), to);
+            if (adj_node->pq_node) {
+                pq.update(adj_node->pq_node, -adj_node->guess_score);
+            } else {
+                adj_node->pq_node = pq.enqueue(adj_node, -adj_node->guess_score);
+            }
+        }
+    }
+    update_prev(nodes);
+    update_path(nodes, to);
 }
 
 
@@ -107,6 +224,7 @@ void App::run()
         poll_();
         input.flush_events();
 
+        gs.prev_geometry->upload();
         scene.update();
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -176,7 +294,7 @@ void App::setup_scene_()
     Material* obstacle_material = material_manager.create_material();
 
     path_material->ambient_color = {0.0f, 1.0f, 1.0f};
-    prev_material->ambient_color = {1.0f, 1.0f, 0.0f};
+    prev_material->ambient_color = {1.0f, 0.0f, 1.0f};
     ground_material->diffuse_color = {0.8f, 0.8f, 0.8f};
     gs.cursor_material->diffuse_color = {0.0f, 1.f, 0.0f};
     obstacle_material->diffuse_color = {1.0f, 1.f, 1.0f};
@@ -272,12 +390,22 @@ void App::handle(const MouseButtonInputEvent& event)
     if (event.button == 0 && event.action == GLFW_RELEASE) {
         toggle_block(&scene);
     }
+    if (event.button == 1 && event.action == GLFW_RELEASE) {
+        if (gs.has_from) {
+            find_path({gs.from_x, gs.from_y}, {gs.grid_x, gs.grid_y});
+            gs.has_from = false;
+        } else {
+            gs.from_x = gs.grid_x;
+            gs.from_y = gs.grid_y;
+            gs.has_from = true;
+        }
+    }
 }
 
 
 void App::handle(const MouseScrollInputEvent& event)
 {
-    float camera_speed = 0.02f;
+    float camera_speed = 0.1f;
     gs.magnify -= camera_speed * event.scroll_y;
     if (gs.magnify < 0.2f) gs.magnify = 0.2f;
     if (gs.magnify > 5.f) gs.magnify = 5.f;
