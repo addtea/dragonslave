@@ -25,12 +25,14 @@ void SceneGroup::destroy()
 void SceneGroup::add_child(SceneNode* child)
 {
     children_.add(&child->sibling_node);
+    child->parent = this;
 }
 
 
 void SceneGroup::remove_child(SceneNode* child)
 {
     children_.remove(&child->sibling_node);
+    child->parent = nullptr;
 }
 
 
